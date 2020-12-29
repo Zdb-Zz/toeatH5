@@ -10,7 +10,7 @@
 
 ## 效果演示
 
-<a onclick="javascript:alert('暂未开放！努力开发中！')">查看demo请戳这里</a> ✨✨
+<a onclick="http://121.4.60.27:8082/#/login">查看demo请戳这里</a> ✨✨
 
 ## 技术栈
 
