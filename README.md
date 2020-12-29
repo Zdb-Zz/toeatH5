@@ -6,9 +6,7 @@
 - `npm` >= 3.0.0
 - `浏览器（IE）` >= 8
 
-## 开发团队
 
-齐圣前端开发小组
 
 ## 效果演示
 
@@ -16,7 +14,7 @@
 
 ## 技术栈
 
-`vue` + `vue-router` + `svg` + [element-UI](http://element-cn.eleme.io/#/zh-CN/component/installation) + `vuex` + `webpack`
+`vue` + `vue-router` + `vant`+ `vuex` + `webpack`
 
 ## 项目启动
 
