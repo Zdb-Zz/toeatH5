@@ -6,17 +6,15 @@
 - `npm` >= 3.0.0
 - `浏览器（IE）` >= 8
 
-## 开发团队
 
-齐圣前端开发小组
 
 ## 效果演示
 
-<a onclick="javascript:alert('暂未开放！努力开发中！')">查看demo请戳这里</a> ✨✨
+查看demo http://121.4.60.27:8082/#/login ✨✨
 
 ## 技术栈
 
-`vue` + `vue-router` + `svg` + [element-UI](http://element-cn.eleme.io/#/zh-CN/component/installation) + `vuex` + `webpack`
+`vue` + `vue-router` + `vant`+ `vuex` + `webpack`
 
 ## 项目启动
 
