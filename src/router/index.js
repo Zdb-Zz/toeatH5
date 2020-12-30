@@ -73,7 +73,10 @@ export default new Router({
     {
       path: '/custmer/菜单',
       name: '菜单',
-      component: toMenu
+      component: toMenu,
+      meta:{
+        keepAlive:true
+      }
     },
     
   ]

@@ -4,9 +4,13 @@
       title="菜单"
       class="formTop"
     />
-    <van-tree-select height="100%" :items="items" :main-active-index.sync="active">
+    <van-tree-select
+      height="100%"
+      :items="items" 
+      :main-active-index.sync="active" 
+      @click-nav="getMenuListByType">
       <template #content>
-        <van-pull-refresh v-model="refreshing" @refresh="onRefresh" v-if="active === 0">
+        <van-pull-refresh v-model="refreshing" @refresh="onRefresh">
           <van-list
             :finished="finished"
             finished-text="没有更多了"
@@ -14,11 +18,11 @@
           >
             <van-cell v-for="item in list" :key="item.menuId">
               <van-card
-                v-if="item.menuType ==1"
                 :price=item.priceAfterDiscount
                 :origin-price=item.menuPrice
                 :title=item.menuName
                 :thumb=item.menuImg
+                @click="getMenuById(item.menuId)"
               >
               <template #tag v-if="item.menuIsNice==1" v-show="true">
                 <van-tag plain type="danger">
@@ -42,12 +46,23 @@
                   {{item.menuTypeDes}}
                 </van-tag>
               </template>
+              <template #footer>
+                <van-button class="setNum" size="mini" @click.stop="item.num--" :disabled="item.num<=0?true:false">-</van-button>
+                  {{item.num}}
+                <van-button class="setNum" size="mini" @click="item.num++">+</van-button>
+              </template>
               </van-card>
             </van-cell>
           </van-list>
         </van-pull-refresh>
       </template>
     </van-tree-select>
+    <van-submit-bar :price="3050" button-text="提交订单" @submit="onSubmit" >
+      <van-button round block type="info" class="shopCar">
+      查看购物车
+    </van-button>
+    </van-submit-bar>
+    
   </div>
 </template>
 
@@ -58,7 +73,8 @@ export default {
   data() {
     return {  
       query:{
-        storeId:''
+        storeId:'',
+        menuType:''
       },
       active:0,
       list:[],
@@ -69,24 +85,24 @@ export default {
     };
   },
   created(){
-  },
-  mounted(){
     this.query.storeId = this.$route.query.storeId
-    console.log(this.$route.query.storeId);
-    console.log(this.query.storeId);
-    getMenuList(this.query).then(res=>{
-      this.list = res.data
-      console.log(res)
-    })
     getMenuStringList(this.query).then(res=>{
       this.items = res.data
+      this.query.menuType = this.items[this.active].menuTypeId
       console.log(res)
+      getMenuList(this.query).then(res=>{
+      this.list = res.data
+      console.log(this.list)
     })
+    })
+  },
+  mounted(){
   },
   
   methods:{
     //下拉刷新
     onLoad() {
+        this.query.menuType = this.items[this.active].menuTypeId
         getMenuList(this.query).then(res => {
           console.log(res)
           this.list=res.data
@@ -103,6 +119,24 @@ export default {
       this.loading = true;
       this.onLoad();
     },
+    getMenuListByType(){
+      console.log(this.items[this.active].menuTypeId)
+      this.query.menuType = this.items[this.active].menuTypeId
+      getMenuList(this.query).then(res => {
+          console.log(res)
+          this.list=res.data
+          this.refreshing = false;
+          this.loading = false;
+          this.finished = true;
+        });
+    },
+    getMenuById(menuId){
+      console.log(menuId)
+
+    },
+    onSubmit(){
+
+    }
   }
 };
 </script>
@@ -130,4 +164,20 @@ a {
   margin-bottom: 1rem;
 }
 
+.shopCar{
+    width: 2.933333rem;
+    height: 1.066667rem;
+    font-weight: 500;
+}
+.van-tree-select__content {
+    -webkit-box-flex: 3;
+    -webkit-flex: 3;
+    flex: 3;
+}
+.setNum{
+  background-color:tomato;
+  color: white;
+  height: 0.4rem;
+  z-index: 99;
+}
 </style>

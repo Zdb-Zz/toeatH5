@@ -66,7 +66,9 @@
               title="新增菜品"
               class="formTop"
               left-text="取消"
+              right-text="提交"
               @click-left="show = false"
+              @click-right="addMenu"
             />
             <van-field
               v-model="food.menuName"
@@ -151,11 +153,6 @@
                     @change="selectImg($event)"/>
                 </div>
               </div>
-            <div style="margin: 16px;">
-              <van-button round block type="info" native-type="submit">
-                提交
-              </van-button>
-            </div>
           </van-form>
         </div>
       </div>
@@ -171,7 +168,9 @@
               title="编辑菜品"
               class="formTop"
               left-text="取消"
+              right-text="提交"
               @click-left="editShow = false"
+              @click-right="editMenu"
             />
             <van-field
               v-model="food.menuName"
@@ -239,7 +238,7 @@
             </van-popup>
             <div class="box">
               <div class="foodImg">
-                <van-image  :src="`${imgSrc}` ">
+                <van-image  :src="`${imgSrc}` " width="2rem" height="2rem">
                 <template v-slot:loading>
                   <van-loading type="spinner" size="20" />
                 </template>
@@ -255,11 +254,6 @@
                   accept="image/gif,image/jpeg,image/jpg,image/png"
                   @change="selectImg($event)"/>
               </div>
-            </div>
-            <div style="margin: 16px;">
-              <van-button round block type="info" native-type="submit">
-                提交
-              </van-button>
             </div>
           </van-form>
         </div>
