@@ -156,4 +156,85 @@ export const getMenuTypeList = () => {
     });
 };
 
+/**
+ * 消费者列表/购物车添加数量
+ */
+export const addMenuNum = (menuId) => {
+    return request({
+        url: '/back/menu/addMenuNum',
+        method: 'get',
+        params: {menuId}
+    });
+};
 
+/**
+ * 消费者列表/购物车添加数量
+ */
+export const subMenuNum = (menuId) => {
+    return request({
+        url: '/back/menu/subMenuNum',
+        method: 'get',
+        params: {menuId}
+    });
+};
+
+/**
+ * 消费者列表/购物车添加数量
+ */
+export const getTotalPrice = () => {
+    return request({
+        url: '/back/menu/getTotalPrice',
+        method: 'get'
+    });
+};
+
+/**
+ * 消费者列表/购物车添加数量
+ */
+export const getShopCarList = () => {
+    return request({
+        url: '/back/menu/getShopCarList',
+        method: 'get'
+    });
+};
+
+/**
+ * 清空购物车
+ */
+export const cleanShopCar = (storeId) => {
+    return request({
+        url: '/back/menu/cleanShopCar',
+        method: 'get',
+        params:{storeId}
+    });
+};
+
+/**
+ * 收藏菜品
+ */
+export const collectMenu = (menuId) => {
+    return request({
+        url: '/back/menu/collectMenu',
+        method: 'get',
+        params:{menuId}
+    });
+};
+/**
+ * 取消收藏菜品
+ */
+export const unCollectMenu = (menuId) => {
+    return request({
+        url: '/back/menu/unCollectMenu',
+        method: 'get',
+        params:{menuId}
+    });
+};
+/**
+ * 获取推荐列表
+ */
+export const getRecommendList = () => {
+    return request({
+        url: '/back/menu/getRecommendList',
+        method: 'get',
+    });
+};

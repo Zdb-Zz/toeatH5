@@ -3,113 +3,184 @@
     <van-nav-bar
       title="菜单"
       class="formTop"
+      left-text="返回"
+      @click-left="onClickLeft"
+      right-text="智能点餐"
+      @click-right="onClickRight"
     />
     <van-tree-select
       height="100%"
-      :items="items" 
-      :main-active-index.sync="active" 
-      @click-nav="getMenuListByType">
+      :items="items"
+      :main-active-index.sync="active"
+      @click-nav="getMenuListByType"
+    >
       <template #content>
         <van-pull-refresh v-model="refreshing" @refresh="onRefresh">
-          <van-list
-            :finished="finished"
-            finished-text="没有更多了"
-            @load="onLoad"
-          >
+          <van-list :finished="finished" finished-text="没有更多了" @load="onLoad">
             <van-cell v-for="item in list" :key="item.menuId">
               <van-card
-                :price=item.priceAfterDiscount
-                :origin-price=item.menuPrice
-                :title=item.menuName
-                :thumb=item.menuImg
+                :price="item.priceAfterDiscount"
+                :origin-price="item.menuPrice"
+                :title="item.menuName"
+                :thumb="item.menuImg"
+                :desc="'销量：'+item.menuSales"
                 @click="getMenuById(item.menuId)"
               >
-              <template #tag v-if="item.menuIsNice==1" v-show="true">
-                <van-tag plain type="danger">
-                  招牌
-                </van-tag>
-              </template>
-              <template #tags >
-                <van-tag plain type="danger" v-if="item.menuFlavor==1" v-show="true">
-                  不辣
-                </van-tag>
-                <van-tag plain type="danger" v-if="item.menuFlavor==2" v-show="true">
-                  微辣
-                </van-tag>
-                <van-tag plain type="danger" v-if="item.menuFlavor==3" v-show="true">
-                  中辣
-                </van-tag>
-                <van-tag plain type="danger" v-if="item.menuFlavor==4" v-show="true">
-                  特辣
-                </van-tag>
-                <van-tag plain type="danger" v-if="item.menuTypeDes!=null" v-show="true">
-                  {{item.menuTypeDes}}
-                </van-tag>
-              </template>
-              <template #footer>
-                <van-button class="setNum" size="mini" @click.stop="item.num--" :disabled="item.num<=0?true:false">-</van-button>
-                  {{item.num}}
-                <van-button class="setNum" size="mini" @click="item.num++">+</van-button>
-              </template>
+                <template #tag v-if="item.menuIsNice==1" v-show="true">
+                  <van-tag plain type="danger">招牌</van-tag>
+                </template>
+                <template #tags>
+                  <van-tag plain type="danger" v-if="item.menuFlavor==1" v-show="true">不辣</van-tag>
+                  <van-tag plain type="danger" v-if="item.menuFlavor==2" v-show="true">微辣</van-tag>
+                  <van-tag plain type="danger" v-if="item.menuFlavor==3" v-show="true">中辣</van-tag>
+                  <van-tag plain type="danger" v-if="item.menuFlavor==4" v-show="true">特辣</van-tag>
+                  <van-icon
+                    name="star"
+                    class="collectIcon"
+                    color="#FF6600"
+                    size="0.6rem"
+                    @click="item.collect=!item.collect,unCollectMenu(item.menuId)"
+                    v-if="item.collect"
+                  />
+                  <van-icon
+                    name="star-o"
+                    class="collectIcon"
+                    color="#FF6600"
+                    size="0.6rem"
+                    @click="item.collect=!item.collect,collectMenu(item.menuId)"
+                    v-if="!item.collect"
+                  />
+                </template>
+                <template #footer>
+                  <van-stepper
+                    v-model="item.menuNum"
+                    min="0"
+                    default-value="0"
+                    show-input
+                    long-press
+                    @plus="addMenuNum(item.menuId)"
+                    @minus="subMenuNum(item.menuId)"
+                  />
+                </template>
               </van-card>
             </van-cell>
           </van-list>
         </van-pull-refresh>
       </template>
     </van-tree-select>
-    <van-submit-bar :price="3050" button-text="提交订单" @submit="onSubmit" >
-      <van-button round block type="info" class="shopCar">
-      查看购物车
-    </van-button>
+    <van-submit-bar :price="totalPrice" button-text="提交订单" @submit="onSubmit">
+      <van-button
+        round
+        block
+        type="info"
+        class="shopCar"
+        @click="shopCarShow=!shopCarShow,getShopCarList()"
+      >查看购物车</van-button>
+      <van-popup
+        v-model="shopCarShow"
+        position="bottom"
+        closeable
+        :style="{ height: '40%',marginBottom:'1.4rem',paddingTop:'0.3rem'}"
+      >
+        <van-nav-bar title="购物车" class="formTop"  @click-left="cleanShopCar" v-if="shopCarList==null || shopCarList.length==0"/>
+        <van-nav-bar title="购物车" class="formTop" left-text="清空购物车" @click-left="cleanShopCar" v-if="shopCarList!=null && shopCarList.length!=0"/>
+        <van-cell
+          v-if="shopCarList==null || shopCarList.length==0"
+          center
+          title="购物车是空的！快去买点什么吧!"
+          :title-style="{color:'#ee0a24'}"
+        />
+        <van-list v-model="loading" :finished="finished" @load="onLoad">
+          <van-cell
+            v-for="item in shopCarList"
+            center
+            :key="item.menuId"
+            :title="item.menuName"
+            :label="'￥'+item.priceAfterDiscount"
+            v-if="item.menuNum != null && shopCarList!=null"
+          >
+            <van-stepper
+              v-model="item.menuNum"
+              min="0"
+              default-value="0"
+              show-input
+              long-press
+              @plus="addMenuNum(item.menuId)"
+              @minus="subMenuNum(item.menuId)"
+            />
+          </van-cell>
+        </van-list>
+      </van-popup>
     </van-submit-bar>
-    
+    <van-popup v-model="menuShow" closeable position="bottom" :style="{ height: '100%'}">内容</van-popup>
   </div>
 </template>
 
 <script>
-import {getMenuList,getMenuStringList}from '../../api/index'
-import router from '../../router';
+import { Toast } from "vant";
+import {
+  getMenuList,
+  getMenuStringList,
+  addMenuNum,
+  subMenuNum,
+  getTotalPrice,
+  getShopCarList,
+  collectMenu,
+  unCollectMenu,
+  getRecommendList,
+  cleanShopCar,
+} from "../../api/index";
+import router from "../../router";
+import { Dialog } from "vant";
+
 export default {
   data() {
-    return {  
-      query:{
-        storeId:'',
-        menuType:''
+    return {
+      query: {
+        storeId: "",
+        menuType: "",
       },
-      active:0,
-      list:[],
+      active: 0,
+      list: [],
       loading: false,
-      finished: false,
+      finished: true,
       refreshing: false,
-      items:[]
+      items: [{}],
+      totalPrice: 0,
+      shopCarShow: false,
+      shopCarList: [],
+      menuShow: false,
     };
   },
-  created(){
-    this.query.storeId = this.$route.query.storeId
-    getMenuStringList(this.query).then(res=>{
-      this.items = res.data
-      this.query.menuType = this.items[this.active].menuTypeId
-      console.log(res)
-      getMenuList(this.query).then(res=>{
-      this.list = res.data
-      console.log(this.list)
-    })
-    })
+  created() {
+    this.query.storeId = this.$route.query.storeId;
+    getMenuStringList(this.query).then((res) => {
+      this.items = res.data;
+      this.query.menuType = this.items[this.active].menuTypeId;
+      getMenuList(this.query).then((res) => {
+        this.list = res.data;
+        console.log(this.list);
+      });
+    });
+    getTotalPrice().then((res) => {
+      this.totalPrice = res.data * 100;
+    });
+    Toast.setDefaultOptions({ duration: 700 });
   },
-  mounted(){
-  },
-  
-  methods:{
+  mounted() {},
+
+  methods: {
     //下拉刷新
     onLoad() {
-        this.query.menuType = this.items[this.active].menuTypeId
-        getMenuList(this.query).then(res => {
-          console.log(res)
-          this.list=res.data
-          this.refreshing = false;
-          this.loading = false;
-          this.finished = true;
-        });
+      this.query.menuType = this.items[this.active].menuTypeId;
+      console.log(this.items[this.active]);
+      getMenuList(this.query).then((res) => {
+        console.log(res);
+        this.list = res.data;
+        this.refreshing = false;
+        this.loading = false;
+        this.finished = true;
+      });
     },
     onRefresh() {
       // 清空列表数据
@@ -119,31 +190,115 @@ export default {
       this.loading = true;
       this.onLoad();
     },
-    getMenuListByType(){
-      console.log(this.items[this.active].menuTypeId)
-      this.query.menuType = this.items[this.active].menuTypeId
-      getMenuList(this.query).then(res => {
-          console.log(res)
-          this.list=res.data
-          this.refreshing = false;
-          this.loading = false;
-          this.finished = true;
+    getMenuListByType() {
+      this.query.menuType = this.items[this.active].menuTypeId;
+      getMenuList(this.query).then((res) => {
+        console.log(res);
+        this.list = res.data;
+        this.refreshing = false;
+        this.loading = false;
+        this.finished = true;
+      });
+    },
+    getMenuById(menuId) {
+      this.menuShow = true;
+      console.log(menuId);
+    },
+    onSubmit() {},
+    subMenuNum(menuId) {
+      event.stopPropagation();
+      subMenuNum(menuId).then((res) => {
+        getTotalPrice().then((res) => {
+          this.totalPrice = res.data * 100;
+          console.log(this.totalPrice);
+          getMenuList(this.query).then((res) => {
+            console.log(res);
+            this.list = res.data;
+            this.refreshing = false;
+            this.loading = false;
+            this.finished = true;
+          });
         });
+      });
     },
-    getMenuById(menuId){
-      console.log(menuId)
-
+    addMenuNum(menuId) {
+      event.stopPropagation();
+      addMenuNum(menuId).then((res) => {
+        getTotalPrice().then((res) => {
+          this.totalPrice = res.data * 100;
+          console.log(this.totalPrice);
+          getMenuList(this.query).then((res) => {
+            console.log(res);
+            this.list = res.data;
+            this.refreshing = false;
+            this.loading = false;
+            this.finished = true;
+          });
+        });
+      });
     },
-    onSubmit(){
-
-    }
-  }
+    getShopCarList() {
+      getShopCarList().then((res) => {
+        console.log(res);
+        this.shopCarList = res.data;
+        console.log(this.shopCarList);
+      });
+    },
+    collectMenu(menuId) {
+      event.stopPropagation();
+      collectMenu(menuId).then((res) => {
+        console.log(res);
+        if (res.code == 1) {
+          Toast.success("收藏成功");
+        } else if (res.code == 3) {
+          Toast.fail("收藏失败");
+        }
+      });
+      console.log("收藏" + menuId);
+    },
+    unCollectMenu(menuId) {
+      event.stopPropagation();
+      unCollectMenu(menuId).then((res) => {
+        console.log(res);
+        if (res.code == 1) {
+          Toast.success("取消收藏成功");
+        } else if (res.code == 3) {
+          Toast.fail("取消收藏失败");
+        }
+      });
+      console.log("取消收藏" + menuId);
+    },
+    onClickLeft() {
+      router.push("/custmer/商家列表");
+    },
+    onClickRight() {
+      getRecommendList().then((res) => {
+        console.log(res);
+      });
+    },
+    cleanShopCar() {
+      Dialog.confirm({
+        title: "清空购物车",
+        message: "请确认清空",
+      }).then(() => {
+          cleanShopCar(this.query.storeId).then((res)=>{
+            this.onRefresh()
+            this.shopCarShow = false
+          })
+        })
+        .catch(() => {
+          // on cancel
+        });
+      
+    },
+  },
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h1, h2 {
+h1,
+h2 {
   font-weight: normal;
 }
 ul {
@@ -157,27 +312,35 @@ li {
 a {
   color: #42b983;
 }
-.loginForm{
-  margin-top:1rem;
-}
-.formTop{
-  margin-bottom: 1rem;
-}
-
-.shopCar{
-    width: 2.933333rem;
-    height: 1.066667rem;
-    font-weight: 500;
+.shopCar {
+  width: 2.933333rem;
+  height: 1.066667rem;
+  font-weight: 500;
 }
 .van-tree-select__content {
-    -webkit-box-flex: 3;
-    -webkit-flex: 3;
-    flex: 3;
+  -webkit-box-flex: 3;
+  -webkit-flex: 3;
+  flex: 3;
 }
-.setNum{
-  background-color:tomato;
+.setNum {
+  background-color: tomato;
   color: white;
   height: 0.4rem;
   z-index: 99;
+}
+.van-cell {
+  font-size: 0.483333rem;
+}
+.van-list {
+  margin-bottom: 1.333333rem;
+}
+.van-card__title {
+  font-size: 0.43rem;
+  font-weight: 1000;
+  line-height: 0.43rem;
+}
+.van-icon {
+  position: relative;
+  float: right;
 }
 </style>
