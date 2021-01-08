@@ -39,16 +39,16 @@
                     class="collectIcon"
                     color="#FF6600"
                     size="0.6rem"
-                    @click="item.collect=!item.collect,unCollectMenu(item.menuId)"
-                    v-if="item.collect"
+                    @click="item.isCollect=!item.isCollect,unCollectMenu(item.menuId)"
+                    v-if="item.isCollect"
                   />
                   <van-icon
                     name="star-o"
                     class="collectIcon"
                     color="#FF6600"
                     size="0.6rem"
-                    @click="item.collect=!item.collect,collectMenu(item.menuId)"
-                    v-if="!item.collect"
+                    @click="item.isCollect=!item.isCollect,collectMenu(item.menuId)"
+                    v-if="!item.isCollect"
                   />
                 </template>
                 <template #footer>
@@ -80,10 +80,21 @@
         v-model="shopCarShow"
         position="bottom"
         closeable
-        :style="{ height: '40%',marginBottom:'1.4rem',paddingTop:'0.3rem'}"
+        :style="{ height: '60%',paddingTop:'0.3rem'}"
       >
-        <van-nav-bar title="购物车" class="formTop"  @click-left="cleanShopCar" v-if="shopCarList==null || shopCarList.length==0"/>
-        <van-nav-bar title="购物车" class="formTop" left-text="清空购物车" @click-left="cleanShopCar" v-if="shopCarList!=null && shopCarList.length!=0"/>
+        <van-nav-bar
+          title="购物车"
+          class="formTop"
+          @click-left="cleanShopCar"
+          v-if="shopCarList==null || shopCarList.length==0"
+        />
+        <van-nav-bar
+          title="购物车"
+          class="formTop"
+          left-text="清空购物车"
+          @click-left="cleanShopCar"
+          v-if="shopCarList!=null && shopCarList.length!=0"
+        />
         <van-cell
           v-if="shopCarList==null || shopCarList.length==0"
           center
@@ -110,9 +121,41 @@
             />
           </van-cell>
         </van-list>
+        <van-submit-bar :price="totalPrice" button-text="提交订单" @submit="onSubmit" />
       </van-popup>
     </van-submit-bar>
     <van-popup v-model="menuShow" closeable position="bottom" :style="{ height: '100%'}">内容</van-popup>
+    <van-popup v-model="recommendShow" :style="{width:'90%', height: '90%'}">
+      <van-nav-bar title="推荐菜单" class="formTop" :style="{fontSize:'0.5rem'}" @click-left="onClickRight" >
+        <template #left >
+          换一批
+          <van-icon name="replay"  :style="{fontSize:'0.5rem'}"/>
+        </template>
+      </van-nav-bar>
+
+      <van-cell v-for="item in recommendList" :key="item.menuId">
+        <van-card
+          :price="item.priceAfterDiscount"
+          :origin-price="item.menuPrice"
+          :title="item.menuName"
+          :thumb="item.menuImg"
+          :desc="item.recommendByMenu"
+          @click="getMenuById(item.menuId)"
+        >
+          <template #footer>
+            <van-stepper
+              v-model="item.menuNum"
+              min="0"
+              default-value="0"
+              show-input
+              long-press
+              @plus="addMenuNum(item.menuId)"
+              @minus="subMenuNum(item.menuId)"
+            />
+          </template>
+        </van-card>
+      </van-cell>
+    </van-popup>
   </div>
 </template>
 
@@ -132,6 +175,8 @@ import {
 } from "../../api/index";
 import router from "../../router";
 import { Dialog } from "vant";
+import { Overlay } from "vant";
+import { Col, Row } from "vant";
 
 export default {
   data() {
@@ -150,6 +195,8 @@ export default {
       shopCarShow: false,
       shopCarList: [],
       menuShow: false,
+      recommendShow: false,
+      recommendList: [],
     };
   },
   created() {
@@ -273,23 +320,25 @@ export default {
     },
     onClickRight() {
       getRecommendList().then((res) => {
+        this.recommendList = res.data;
         console.log(res);
       });
+      this.recommendShow = true;
     },
     cleanShopCar() {
       Dialog.confirm({
         title: "清空购物车",
         message: "请确认清空",
-      }).then(() => {
-          cleanShopCar(this.query.storeId).then((res)=>{
-            this.onRefresh()
-            this.shopCarShow = false
-          })
+      })
+        .then(() => {
+          cleanShopCar(this.query.storeId).then((res) => {
+            this.onRefresh();
+            this.shopCarShow = false;
+          });
         })
         .catch(() => {
           // on cancel
         });
-      
     },
   },
 };
@@ -342,5 +391,12 @@ a {
 .van-icon {
   position: relative;
   float: right;
+}
+.recommendBox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
 }
 </style>

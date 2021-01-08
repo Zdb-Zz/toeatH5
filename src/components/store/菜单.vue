@@ -44,7 +44,7 @@
       <van-tabbar-item icon="friends-o" @click="center">商家中心</van-tabbar-item>
     </van-tabbar>
     <!--遮罩层-->
-    <van-overlay :show="show" @click="show = false" @change="editDiscount($event)">
+    <van-popup v-model="show" @change="editDiscount($event)">
       <div class="wrapper" @click.stop>
         <div class="addMenu">
           <van-form @submit="addMenu" class="addMenuForm">
@@ -143,10 +143,9 @@
           </van-form>
         </div>
       </div>
-    </van-overlay>
-
-    <!-- 编辑菜品 -->
-    <van-overlay :show="editShow" @click="editShow = false" @change="editDiscount($event)">
+    </van-popup>
+    <!-- 编辑菜品 -->.
+    <van-popup v-model="editShow" @change="editDiscount($event)">
       <div class="wrapper" @click.stop>
         <div class="addMenu">
           <van-form @submit="editMenu" class="addMenuForm">
@@ -245,7 +244,7 @@
           </van-form>
         </div>
       </div>
-    </van-overlay>
+    </van-popup>
   </div>
 </template>
 
@@ -593,10 +592,13 @@ a {
   justify-content: center;
   height: 100%;
 }
-
+.van-popup--center {
+    width: 90%;
+    height: 90%;
+}
 .addMenu {
-  width: 90%;
-  height: 90%;
+  width: 100%;
+  height: 100%;
   background-color: #fff;
 }
 .van-radio--horizontal {
@@ -689,5 +691,8 @@ a {
   -webkit-box-flex: 3;
   -webkit-flex: 3;
   flex: 3;
+}
+.upDiv .upinp[data-v-47984b77] {
+    width: 100%;
 }
 </style>
