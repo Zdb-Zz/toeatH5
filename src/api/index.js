@@ -238,3 +238,32 @@ export const getRecommendList = () => {
         method: 'get',
     });
 };
+
+/**
+ * 获取用户信息
+ */
+export const findUser = () => {
+    return request({
+        url: '/back/user/findUser',
+        method: 'get',
+    });
+};
+/**
+ * 获取用户信息
+ */
+export const editUser = query => {
+    return request({
+        url: '/back/user/editUser',
+        method: "post",
+        data:query
+    });
+};
+/**
+ * 获取用户收藏列表
+ */
+export const getCollectList = () => {
+    return request({
+        url: '/back/menu/getCollectList',
+        method: "get",
+    });
+};

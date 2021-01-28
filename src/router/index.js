@@ -11,6 +11,9 @@ import register from '@/components/register'
 import storeCenter from '@/components/store/商家中心.vue'
 import chart from '@/components/store/统计.vue'
 import toMenu from '@/components/custmer/菜单'
+import personalDate from '@/components/custmer/个人信息'
+import mineOrder from '@/components/custmer/我的订单'
+import mineCollect from '@/components/custmer/我的收藏'
 
 Vue.use(Router)
 
@@ -78,6 +81,20 @@ export default new Router({
         keepAlive:true
       }
     },
-    
+    {
+      path: '/custmer/个人信息',
+      name: '个人信息',
+      component: personalDate,
+    },
+    {
+      path: '/custmer/我的订单',
+      name: '我的订单',
+      component: mineOrder,
+    },
+    {
+      path: '/custmer/我的收藏',
+      name: '我的收藏',
+      component: mineCollect,
+    },
   ]
 })
