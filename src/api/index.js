@@ -267,3 +267,47 @@ export const getCollectList = () => {
         method: "get",
     });
 };
+
+/**
+ * 获取用户收藏列表
+ */
+export const submitOrder = query => {
+    return request({
+        url: '/back/order/submitOrder',
+        method: "post",
+        data:query
+    });
+};
+
+/**
+ * 获取订单列表
+ */
+export const getOrders = (storeId) => {
+    return request({
+        url: '/back/order/getOrders',
+        method: "get",
+        params:{storeId}
+    });
+};
+
+/**
+ * 获取订单详情
+ */
+export const getOrderById = (orderId) => {
+    return request({
+        url: '/back/order/getOrderById',
+        method: "get",
+        params:{orderId}
+    });
+};
+
+/**
+ * 评价订单
+ */
+export const evaluateOrder =query => {
+    return request({
+        url: '/back/order/evaluateOrder',
+        method: "post",
+        data:query
+    });
+};

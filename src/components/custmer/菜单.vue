@@ -68,7 +68,7 @@
         </van-pull-refresh>
       </template>
     </van-tree-select>
-    <van-submit-bar :price="totalPrice" button-text="提交订单" @submit="onSubmit">
+    <van-submit-bar :price="totalPrice" button-text="生成订单" @submit="onSubmit">
       <van-button
         round
         block
@@ -121,15 +121,20 @@
             />
           </van-cell>
         </van-list>
-        <van-submit-bar :price="totalPrice" button-text="提交订单" @submit="onSubmit" />
+        <van-submit-bar :price="totalPrice" button-text="生成订单" @submit="onSubmit" />
       </van-popup>
     </van-submit-bar>
     <van-popup v-model="menuShow" closeable position="bottom" :style="{ height: '100%'}">内容</van-popup>
-    <van-popup v-model="recommendShow" :style="{width:'90%', height: '90%'}">
-      <van-nav-bar title="推荐菜单" class="formTop" :style="{fontSize:'0.5rem'}" @click-left="onClickRight" >
-        <template #left >
+    <van-popup v-model="recommendShow" :style="{width:'90%', height: '75%'}">
+      <van-nav-bar
+        title="推荐菜单"
+        class="formTop"
+        :style="{fontSize:'0.5rem'}"
+        @click-left="onClickRight"
+      >
+        <template #left>
           换一批
-          <van-icon name="replay"  :style="{fontSize:'0.5rem'}"/>
+          <van-icon name="replay" :style="{fontSize:'0.5rem'}" />
         </template>
       </van-nav-bar>
 
@@ -156,6 +161,14 @@
         </van-card>
       </van-cell>
     </van-popup>
+    <div class="orderIcon" @click="gotoMyOrder">
+      <van-icon name="balance-list" size="1rem" />
+    </div>
+    <van-overlay :show="show" @click="show = false" :style="{backgroundColor:'white'}">
+      <div class="wrapper" @click.stop>
+        <van-loading v-if="show" size="2rem" />
+      </div>
+    </van-overlay>
   </div>
 </template>
 
@@ -197,10 +210,13 @@ export default {
       menuShow: false,
       recommendShow: false,
       recommendList: [],
+      container: null,
+      show: true,
     };
   },
   created() {
     this.query.storeId = this.$route.query.storeId;
+    this.show = this.$route.query.show;
     getMenuStringList(this.query).then((res) => {
       this.items = res.data;
       this.query.menuType = this.items[this.active].menuTypeId;
@@ -212,9 +228,22 @@ export default {
     getTotalPrice().then((res) => {
       this.totalPrice = res.data * 100;
     });
+    getShopCarList().then((res) => {
+      console.log(res);
+      this.shopCarList = res.data;
+      console.log(this.shopCarList);
+    });
     Toast.setDefaultOptions({ duration: 700 });
+    setTimeout(() => {
+      this.show = false;
+    }, 100);
   },
-  mounted() {},
+  mounted() {
+    this.container = this.$refs.container;
+    setTimeout(() => {
+      this.show = false;
+    }, 100);
+  },
 
   methods: {
     //下拉刷新
@@ -251,19 +280,35 @@ export default {
       this.menuShow = true;
       console.log(menuId);
     },
-    onSubmit() {},
+    onSubmit() {
+      if (this.shopCarList != null && this.shopCarList.length != 0) {
+        this.$router.push({
+          path: "/custmer/订单提交页",
+          query: {
+            storeId: this.query.storeId,
+          },
+        });
+      } else {
+        Toast.fail("购物车为空哦");
+      }
+    },
     subMenuNum(menuId) {
       event.stopPropagation();
       subMenuNum(menuId).then((res) => {
         getTotalPrice().then((res) => {
           this.totalPrice = res.data * 100;
           console.log(this.totalPrice);
-          getMenuList(this.query).then((res) => {
+          // getMenuList(this.query).then((res) => {
+          //   console.log(res);
+          //   this.list = res.data;
+          //   this.refreshing = false;
+          //   this.loading = false;
+          //   this.finished = true;
+          // });
+          getShopCarList().then((res) => {
             console.log(res);
-            this.list = res.data;
-            this.refreshing = false;
-            this.loading = false;
-            this.finished = true;
+            this.shopCarList = res.data;
+            console.log(this.shopCarList);
           });
         });
       });
@@ -274,12 +319,17 @@ export default {
         getTotalPrice().then((res) => {
           this.totalPrice = res.data * 100;
           console.log(this.totalPrice);
-          getMenuList(this.query).then((res) => {
+          // getMenuList(this.query).then((res) => {
+          //   console.log(res);
+          //   this.list = res.data;
+          //   this.refreshing = false;
+          //   this.loading = false;
+          //   this.finished = true;
+          // });
+          getShopCarList().then((res) => {
             console.log(res);
-            this.list = res.data;
-            this.refreshing = false;
-            this.loading = false;
-            this.finished = true;
+            this.shopCarList = res.data;
+            console.log(this.shopCarList);
           });
         });
       });
@@ -334,11 +384,23 @@ export default {
           cleanShopCar(this.query.storeId).then((res) => {
             this.onRefresh();
             this.shopCarShow = false;
+            this.totalPrice = 0;
           });
         })
         .catch(() => {
           // on cancel
         });
+    },
+    gotoMyOrder() {
+      this.$router.push({
+        path: "/custmer/我的订单",
+        query: {
+          storeId: this.query.storeId,
+        },
+      });
+    },
+    loadingShow() {
+      this.show = false;
     },
   },
 };
@@ -398,5 +460,18 @@ a {
   justify-content: center;
   height: 100%;
   width: 100%;
+}
+.orderIcon {
+  position: fixed;
+  width: 1rem;
+  height: 1rem;
+  float: left;
+  top: 70%;
+}
+.wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
 }
 </style>

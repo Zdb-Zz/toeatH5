@@ -17,11 +17,14 @@
       <van-tabbar-item icon="home-o" @click="storeList">商家列表</van-tabbar-item>
       <van-tabbar-item icon="friends-o" @click="mine">我的</van-tabbar-item>
     </van-tabbar>
+    <van-button type="info" block :style="{position:'fixed',bottom:'2rem'}" @click="outLogin()">退出登录</van-button>
   </div>
 </template>
 
 <script>
 import router from "../../router";
+import { Dialog } from 'vant';
+
 export default {
   data() {
     return {
@@ -35,6 +38,18 @@ export default {
     mine() {
       router.push("/custmer/我的");
     },
+    outLogin(){
+    Dialog.confirm({
+        title: '注销',
+        message: '是否退出登录',
+        })
+        .then(() => {
+            router.push('/')
+        })
+        .catch(() => {
+            // on cancel
+        });
+    }
   },
 };
 </script>

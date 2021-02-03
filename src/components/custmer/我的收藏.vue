@@ -1,49 +1,46 @@
 <template>
   <div>
     <van-nav-bar title="我的收藏" left-text="返回" @click-left="onClickLeft" class="formTop" />
-    <van-pull-refresh v-model="refreshing" @refresh="onRefresh">
-          <van-list>
-            <van-cell v-for="item in list" :key="item.menuId">
-              <van-card
-                :price="item.priceAfterDiscount"
-                :origin-price="item.menuPrice"
-                :title="item.menuName"
-                :thumb="item.menuImg"
-                :desc="'商家：'+item.storeName"
-              >
-                <template #tags>
-                  <van-tag plain type="danger" v-if="item.menuFlavor==1" v-show="true">不辣</van-tag>
-                  <van-tag plain type="danger" v-if="item.menuFlavor==2" v-show="true">微辣</van-tag>
-                  <van-tag plain type="danger" v-if="item.menuFlavor==3" v-show="true">中辣</van-tag>
-                  <van-tag plain type="danger" v-if="item.menuFlavor==4" v-show="true">特辣</van-tag>
-                </template>
-              </van-card>
-            </van-cell>
-          </van-list>
-        </van-pull-refresh>
-   
+    <van-list>
+      <van-cell v-for="item in list" :key="item.menuId">
+        <van-card
+          :price="item.priceAfterDiscount"
+          :origin-price="item.menuPrice"
+          :title="item.menuName"
+          :thumb="item.menuImg"
+          :desc="'商家：'+item.storeName"
+        >
+          <template #tags>
+            <van-tag plain type="danger" v-if="item.menuFlavor==1" v-show="true">不辣</van-tag>
+            <van-tag plain type="danger" v-if="item.menuFlavor==2" v-show="true">微辣</van-tag>
+            <van-tag plain type="danger" v-if="item.menuFlavor==3" v-show="true">中辣</van-tag>
+            <van-tag plain type="danger" v-if="item.menuFlavor==4" v-show="true">特辣</van-tag>
+          </template>
+        </van-card>
+      </van-cell>
+    </van-list>
   </div>
 </template>
 
 <script>
 import router from "../../router";
-import {getCollectList} from "../../api/index";
+import { getCollectList } from "../../api/index";
 export default {
   data() {
     return {
-      list:[]
+      list: [],
     };
   },
-  created(){
-    console.log("获取收藏列表")
-    getCollectList().then((res)=>{
-      this.list= res.data
-    })
+  created() {
+    console.log("获取收藏列表");
+    getCollectList().then((res) => {
+      this.list = res.data;
+    });
   },
   methods: {
-    onClickLeft(){
-      router.push("/custmer/我的")
-    }
+    onClickLeft() {
+      router.push("/custmer/我的");
+    },
   },
 };
 </script>

@@ -14,6 +14,8 @@ import toMenu from '@/components/custmer/菜单'
 import personalDate from '@/components/custmer/个人信息'
 import mineOrder from '@/components/custmer/我的订单'
 import mineCollect from '@/components/custmer/我的收藏'
+import orderSubmit from '@/components/custmer/订单提交页'
+import orderDetail from '@/components/custmer/订单详情页'
 
 Vue.use(Router)
 
@@ -95,6 +97,16 @@ export default new Router({
       path: '/custmer/我的收藏',
       name: '我的收藏',
       component: mineCollect,
+    },
+    {
+      path: '/custmer/订单提交页',
+      name: '订单提交',
+      component: orderSubmit,
+    },
+    {
+      path: '/custmer/订单详情页',
+      name: '订单详情',
+      component: orderDetail,
     },
   ]
 })
