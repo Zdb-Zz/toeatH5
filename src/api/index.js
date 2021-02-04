@@ -19,10 +19,11 @@ export const updateData = form => {
 /**
  * 获取商家列表
  */
-export const getStoreList = () => {
+export const getStoreList = query => {
     return request({
         url: '/back/store/getStoreList',
-        method: 'get'
+        method: 'get',
+        params:query
     });
 };
 /**
@@ -282,11 +283,11 @@ export const submitOrder = query => {
 /**
  * 获取订单列表
  */
-export const getOrders = (storeId) => {
+export const getOrders = query => {
     return request({
         url: '/back/order/getOrders',
         method: "get",
-        params:{storeId}
+        params:query
     });
 };
 

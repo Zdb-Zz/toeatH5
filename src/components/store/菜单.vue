@@ -1,50 +1,61 @@
 <template>
   <div>
-    <van-nav-bar title="菜单" right-text="新增菜品" @click-right="show = true" class="formTop" />
+    <van-nav-bar title="菜单" right-text="新增菜品" @click-right="addMenuPannel" class="formTop" />
+    <van-search
+      v-model="food.menuName"
+      show-action
+      label="菜名"
+      placeholder="请输入搜索关键词"
+      @search="onSearch"
+    >
+      <template #action>
+        <div @click="onSearch">搜索</div>
+      </template>
+    </van-search>
+
     <van-tree-select
-      height="100%"
+      height="80%"
       :items="items"
       :main-active-index.sync="active"
       @click-nav="getMenuListByType"
     >
       <template #content>
-        <van-pull-refresh v-model="refreshing" @refresh="onRefresh">
-          <van-list :finished="finished" finished-text="没有更多了" @load="onLoad">
-            <van-cell v-for="item in list" :key="item.menuId">
-              <van-card
-                :price="item.priceAfterDiscount"
-                :origin-price="item.menuPrice"
-                :title="item.menuName"
-                :thumb="item.menuImg"
-                :desc="'销量：'+item.menuSales"
-              >
-                <template #tag v-if="item.menuIsNice==1" v-show="true">
-                  <van-tag plain type="danger">招牌</van-tag>
-                </template>
+        <van-empty description="暂无菜品" v-if="list==null" />
+        <van-list :finished="finished" finished-text="没有更多了" @load="onLoad" v-if="list!=null">
+          <van-cell v-for="item in list" :key="item.menuId">
+            <van-card
+              :price="item.priceAfterDiscount"
+              :origin-price="item.menuPrice"
+              :title="item.menuName"
+              :thumb="item.menuImg"
+              :desc="'销量：'+item.menuSales"
+            >
+              <template #tag v-if="item.menuIsNice==1" v-show="true">
+                <van-tag plain type="danger">招牌</van-tag>
+              </template>
 
-                <template #tags>
-                  <van-tag plain type="danger" v-if="item.menuFlavor==1" v-show="true">不辣</van-tag>
-                  <van-tag plain type="danger" v-if="item.menuFlavor==2" v-show="true">微辣</van-tag>
-                  <van-tag plain type="danger" v-if="item.menuFlavor==3" v-show="true">中辣</van-tag>
-                  <van-tag plain type="danger" v-if="item.menuFlavor==4" v-show="true">特辣</van-tag>
-                </template>
-                <template #footer>
-                  <van-button @click="getMenuById(item.menuId)" size="mini">修改</van-button>
-                  <van-button @click="delMenuById(item.menuId)" size="mini">删除</van-button>
-                </template>
-              </van-card>
-            </van-cell>
-          </van-list>
-        </van-pull-refresh>
+              <template #tags>
+                <van-tag plain type="danger" v-if="item.menuFlavor==1" v-show="true">不辣</van-tag>
+                <van-tag plain type="danger" v-if="item.menuFlavor==2" v-show="true">微辣</van-tag>
+                <van-tag plain type="danger" v-if="item.menuFlavor==3" v-show="true">中辣</van-tag>
+                <van-tag plain type="danger" v-if="item.menuFlavor==4" v-show="true">特辣</van-tag>
+              </template>
+              <template #footer>
+                <van-button @click="getMenuById(item.menuId)" size="mini">修改</van-button>
+                <van-button @click="delMenuById(item.menuId)" size="mini">删除</van-button>
+              </template>
+            </van-card>
+          </van-cell>
+        </van-list>
       </template>
     </van-tree-select>
-    <van-tabbar v-model="active">
+    <van-tabbar v-model="tabbarActive">
       <van-tabbar-item icon="home-o" @click="menu">菜单</van-tabbar-item>
       <van-tabbar-item icon="chart-trending-o" @click="chart">统计</van-tabbar-item>
       <van-tabbar-item icon="friends-o" @click="center">商家中心</van-tabbar-item>
     </van-tabbar>
     <!--遮罩层-->
-    <van-popup v-model="show" @change="editDiscount($event)">
+    <van-popup v-model="show">
       <div class="wrapper" @click.stop>
         <div class="addMenu">
           <van-form @submit="addMenu" class="addMenuForm">
@@ -69,6 +80,7 @@
               label="菜品原价格"
               placeholder="菜品原价格"
               :rules="[{ required: true, message: '菜品原价格' }]"
+              @change="editDiscount($event)"
             />
             <van-field
               v-model="food.menuDiscount"
@@ -76,6 +88,7 @@
               label="菜品折扣（%）"
               placeholder="菜品折扣（%）"
               :rules="[{ required: true, message: '菜品折扣（%）' }]"
+              @change="editDiscount($event)"
             />
             <van-field
               v-model="food.priceAfterDiscount"
@@ -144,8 +157,8 @@
         </div>
       </div>
     </van-popup>
-    <!-- 编辑菜品 -->.
-    <van-popup v-model="editShow" @change="editDiscount($event)">
+    <!-- 编辑菜品 -->
+    <van-popup v-model="editShow">
       <div class="wrapper" @click.stop>
         <div class="addMenu">
           <van-form @submit="editMenu" class="addMenuForm">
@@ -170,6 +183,7 @@
               label="菜品原价格"
               placeholder="菜品原价格"
               :rules="[{ required: true, message: '请填写菜品原价格' }]"
+              @change="editDiscount($event)"
             />
             <van-field
               v-model="food.menuDiscount"
@@ -177,6 +191,7 @@
               label="菜品折扣（%）"
               placeholder="菜品折扣（%）"
               :rules="[{ required: true, message: '请填写菜品折扣（%）' }]"
+              @change="editDiscount($event)"
             />
             <van-field
               v-model="food.priceAfterDiscount"
@@ -280,6 +295,7 @@ export default {
   data() {
     return {
       active: 0,
+      tabbarActive: 0,
       storeName: "",
       query: {
         storeId: 0,
@@ -289,13 +305,13 @@ export default {
         menuId: "", //主键id
         menuStoreId: "", //关联商家id
         menuName: "", //菜名
-        menuPrice: "", //价格
+        menuPrice: 0, //价格
         menuImg: "", //图片
         menuFlavor: "1", //口味
         menuType: "0", //类型
         menuIsNice: "1", //招牌
-        menuDiscount: "100", //折扣
-        priceAfterDiscount: "",
+        menuDiscount: 100, //折扣
+        priceAfterDiscount: 0,
       },
       list: [],
       loading: false,
@@ -386,11 +402,11 @@ export default {
       addMenu(this.food).then((res) => {
         if (res.code == 1) {
           this.show = false;
-          (this.food.menuName = ""), //菜名
-            (this.food.menuPrice = ""), //价格
-            (this.food.menuImg = ""), //图片
-            (this.food.menuFlavor = "1"), //口味
-            (this.food.menuIsNice = "1"); //招牌
+          this.food.menuName = ""; //菜名
+          this.food.menuPrice = ""; //价格
+          this.food.menuImg = ""; //图片
+          this.food.menuFlavor = "1"; //口味
+          this.food.menuIsNice = "1"; //招牌
           this.food.menuDiscount = "100"; //折扣
           this.food.priceAfterDiscount = "0"; //折扣
           this.food.menuType = ""; //类型
@@ -469,13 +485,14 @@ export default {
     getMenuById(menuId) {
       getMenuById(menuId).then((res) => {
         if (res.code == 1) {
-          (this.food.menuId = res.data.menuId), //主键id
-            (this.food.menuName = res.data.menuName), //菜名
-            (this.food.menuPrice = res.data.menuPrice), //价格
-            (this.food.menuImg = res.data.menuImg), //图片
-            (this.food.menuFlavor = res.data.menuFlavor + ""), //口味
-            (this.food.menuIsNice = res.data.menuIsNice + ""); //招牌
+          this.food.menuId = res.data.menuId; //主键id
+          this.food.menuName = res.data.menuName; //菜名
+          this.food.menuPrice = res.data.menuPrice; //价格
+          this.food.menuImg = res.data.menuImg; //图片
+          this.food.menuFlavor = res.data.menuFlavor + ""; //口味
+          this.food.menuIsNice = res.data.menuIsNice + ""; //招牌
           this.food.menuDiscount = res.data.menuDiscount + ""; //折扣
+          this.food.priceAfterDiscount = res.data.priceAfterDiscount; //折扣
           this.food.menuType = res.data.menuType;
           this.food.menuTypeDes = res.data.menuTypeDes;
           this.imgSrc = res.data.menuImg;
@@ -489,12 +506,12 @@ export default {
       this.food.menuImg = this.imgSrc;
       editMenu(this.food).then((res) => {
         if (res.code == 1) {
-          (this.food.menuId = ""),
-            (this.food.menuName = ""), //菜名
-            (this.food.menuPrice = ""), //价格
-            (this.food.menuImg = ""), //图片
-            (this.food.menuFlavor = "1"), //口味
-            (this.food.menuIsNice = "1"); //招牌
+          this.food.menuId = "";
+          this.food.menuName = ""; //菜名
+          this.food.menuPrice = ""; //价格
+          this.food.menuImg = ""; //图片
+          this.food.menuFlavor = "1"; //口味
+          this.food.menuIsNice = "1"; //招牌
           this.food.priceAfterDiscount = "0"; //折扣
           this.food.menuDiscount = "100"; //折扣
           this.food.menuType = "";
@@ -531,7 +548,7 @@ export default {
         });
     },
     /**计算折后价格 */
-    editDiscount(event) {
+    editDiscount(e) {
       this.food.priceAfterDiscount =
         (this.food.menuPrice * this.food.menuDiscount) / 100;
     },
@@ -543,6 +560,34 @@ export default {
         this.refreshing = false;
         this.loading = false;
         this.finished = true;
+      });
+    },
+    addMenuPannel() {
+      this.food.menuId = "";
+      this.food.menuName = ""; //菜名
+      this.food.menuPrice = ""; //价格
+      this.food.menuImg = ""; //图片
+      this.food.menuFlavor = "1"; //口味
+      this.food.menuIsNice = "1"; //招牌
+      this.food.priceAfterDiscount = "0"; //折扣
+      this.food.menuDiscount = "100"; //折扣
+      this.food.menuType = "";
+      this.food.menuTypeDes = "";
+      this.imgSrc = "";
+      this.show = true;
+    },
+    onSearch() {
+      this.query.menuName = this.food.menuName;
+      getMenuList(this.query).then((res) => {
+        if (res.data == null) {
+          Toast.fail("没有找到您要的菜哦");
+          this.query.menuName = "";
+        } else {
+          this.list = res.data;
+          this.refreshing = false;
+          this.loading = false;
+          this.finished = true;
+        }
       });
     },
   },
@@ -569,9 +614,6 @@ a {
 .loginForm {
   margin-top: 1rem;
 }
-.formTop {
-  margin-bottom: 1rem;
-}
 .van-card {
   position: relative;
   box-sizing: border-box;
@@ -593,8 +635,8 @@ a {
   height: 100%;
 }
 .van-popup--center {
-    width: 90%;
-    height: 90%;
+  width: 90%;
+  height: 90%;
 }
 .addMenu {
   width: 100%;
@@ -686,6 +728,12 @@ a {
 }
 .van-list {
   margin-bottom: 1.333333rem;
+  padding-left: 2rem;
+}
+.van-tree-select__nav {
+  top: 4.2rem;
+  position: fixed;
+  z-index: 999;
 }
 .van-tree-select__content {
   -webkit-box-flex: 3;
@@ -693,6 +741,6 @@ a {
   flex: 3;
 }
 .upDiv .upinp[data-v-47984b77] {
-    width: 100%;
+  width: 100%;
 }
 </style>

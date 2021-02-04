@@ -1,6 +1,25 @@
 <template>
   <div>
     <van-nav-bar title="商家列表" class="formTop" />
+    <van-search
+      v-model="query.storeName"
+      show-action
+      label="商铺名"
+      placeholder="请输入搜索关键词"
+      @search="onSearch"
+    >
+      <template #action>
+        <div @click="onSearch">搜索</div>
+      </template>
+    </van-search>
+    <van-overlay :show="show">
+      <van-loading
+        color="#1989fa"
+        size="2rem"
+        :style="{position:'fixed',float:'left',zIndex:'1000',top:'50%',left:'50%',transform:' translate(-50%,-50%)'}"
+      />
+    </van-overlay>
+
     <van-pull-refresh v-model="refreshing" @refresh="onRefresh">
       <van-list :finished="finished" finished-text="没有更多了" @load="onLoad">
         <van-cell v-for="item in stores" :key="item.storeId">
@@ -21,20 +40,30 @@
 </template>
 
 <script>
+import { Toast } from "vant";
 import { getStoreList } from "../../api/index";
 import router from "../../router";
 export default {
   data() {
     return {
+      query: {
+        storeName: "",
+      },
       active: 0,
       loading: false,
       finished: false,
       refreshing: false,
       stores: [],
+      show:true
     };
   },
   created() {
     getStoreList().then((res) => {
+      if(res.code==1){
+        this.show=false
+      }else{
+         this.show=false
+      }
       this.stores = res.data;
       console.log(res);
     });
@@ -48,7 +77,7 @@ export default {
     },
     //下拉刷新
     onLoad() {
-      getStoreList().then((res) => {
+      getStoreList(this.query).then((res) => {
         console.log(res);
         this.stores = res.data;
         this.refreshing = false;
@@ -72,9 +101,20 @@ export default {
         },
       });
     },
+    onSearch() {
+      getStoreList(this.query).then((res) => {
+        if (res.data == null) {
+          Toast.fail("没有找到商铺");
+        } else {
+          this.stores = res.data;
+          this.refreshing = false;
+          this.loading = false;
+          this.finished = true;
+        }
+      });
+    },
   },
 };
-</script>
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
@@ -96,8 +136,5 @@ a {
 }
 .loginForm {
   margin-top: 1rem;
-}
-.formTop {
-  margin-bottom: 1rem;
 }
 </style>

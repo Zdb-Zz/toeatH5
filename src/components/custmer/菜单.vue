@@ -8,6 +8,17 @@
       right-text="智能点餐"
       @click-right="onClickRight"
     />
+    <van-search
+      v-model="query.menuName"
+      show-action
+      label="菜名"
+      placeholder="请输入搜索关键词"
+      @search="onSearch"
+    >
+      <template #action>
+        <div @click="onSearch">搜索</div>
+      </template>
+    </van-search>
     <van-tree-select
       height="100%"
       :items="items"
@@ -15,57 +26,64 @@
       @click-nav="getMenuListByType"
     >
       <template #content>
-        <van-pull-refresh v-model="refreshing" @refresh="onRefresh">
-          <van-list :finished="finished" finished-text="没有更多了" @load="onLoad">
-            <van-cell v-for="item in list" :key="item.menuId">
-              <van-card
-                :price="item.priceAfterDiscount"
-                :origin-price="item.menuPrice"
-                :title="item.menuName"
-                :thumb="item.menuImg"
-                :desc="'销量：'+item.menuSales"
-                @click="getMenuById(item.menuId)"
-              >
-                <template #tag v-if="item.menuIsNice==1" v-show="true">
-                  <van-tag plain type="danger">招牌</van-tag>
-                </template>
-                <template #tags>
-                  <van-tag plain type="danger" v-if="item.menuFlavor==1" v-show="true">不辣</van-tag>
-                  <van-tag plain type="danger" v-if="item.menuFlavor==2" v-show="true">微辣</van-tag>
-                  <van-tag plain type="danger" v-if="item.menuFlavor==3" v-show="true">中辣</van-tag>
-                  <van-tag plain type="danger" v-if="item.menuFlavor==4" v-show="true">特辣</van-tag>
-                  <van-icon
-                    name="star"
-                    class="collectIcon"
-                    color="#FF6600"
-                    size="0.6rem"
-                    @click="item.isCollect=!item.isCollect,unCollectMenu(item.menuId)"
-                    v-if="item.isCollect"
-                  />
-                  <van-icon
-                    name="star-o"
-                    class="collectIcon"
-                    color="#FF6600"
-                    size="0.6rem"
-                    @click="item.isCollect=!item.isCollect,collectMenu(item.menuId)"
-                    v-if="!item.isCollect"
-                  />
-                </template>
-                <template #footer>
-                  <van-stepper
-                    v-model="item.menuNum"
-                    min="0"
-                    default-value="0"
-                    show-input
-                    long-press
-                    @plus="addMenuNum(item.menuId)"
-                    @minus="subMenuNum(item.menuId)"
-                  />
-                </template>
-              </van-card>
-            </van-cell>
-          </van-list>
-        </van-pull-refresh>
+        <van-empty description="暂无菜品" v-if="list==null" />
+        <van-list :finished="finished" finished-text="没有更多了" @load="onLoad" v-if="list!=null">
+          <van-cell v-for="item in list" :key="item.menuId">
+            <van-card
+              :price="item.priceAfterDiscount"
+              :origin-price="item.menuPrice"
+              :title="item.menuName"
+              :thumb="item.menuImg"
+              :desc="'销量：'+item.menuSales"
+              @click="getMenuById(item.menuId)"
+            >
+              <template #desc>
+                <span>{{'销量：'+item.menuSales}}</span>
+                <br />
+                <span>{{'销量：'+item.menuSales}}</span>
+                <br />
+              </template>
+              <template #tag v-if="item.menuIsNice==1" v-show="true">
+                <van-tag plain type="danger">招牌</van-tag>
+              </template>
+
+              <template #tags>
+                <van-tag plain type="danger" v-if="item.menuFlavor==1" v-show="true">不辣</van-tag>
+                <van-tag plain type="danger" v-if="item.menuFlavor==2" v-show="true">微辣</van-tag>
+                <van-tag plain type="danger" v-if="item.menuFlavor==3" v-show="true">中辣</van-tag>
+                <van-tag plain type="danger" v-if="item.menuFlavor==4" v-show="true">特辣</van-tag>
+                <van-icon
+                  name="star"
+                  class="collectIcon"
+                  color="#FF6600"
+                  size="0.6rem"
+                  @click="item.isCollect=!item.isCollect,unCollectMenu(item.menuId)"
+                  v-if="item.isCollect"
+                />
+                <van-icon
+                  name="star-o"
+                  class="collectIcon"
+                  color="#FF6600"
+                  size="0.6rem"
+                  @click="item.isCollect=!item.isCollect,collectMenu(item.menuId)"
+                  v-if="!item.isCollect"
+                />
+              </template>
+
+              <template #footer>
+                <van-stepper
+                  v-model="item.menuNum"
+                  min="0"
+                  default-value="0"
+                  show-input
+                  long-press
+                  @plus="addMenuNum(item.menuId)"
+                  @minus="subMenuNum(item.menuId)"
+                />
+              </template>
+            </van-card>
+          </van-cell>
+        </van-list>
       </template>
     </van-tree-select>
     <van-submit-bar :price="totalPrice" button-text="生成订单" @submit="onSubmit">
@@ -197,6 +215,7 @@ export default {
       query: {
         storeId: "",
         menuType: "",
+        menuName: "",
       },
       active: 0,
       list: [],
@@ -402,6 +421,19 @@ export default {
     loadingShow() {
       this.show = false;
     },
+    onSearch() {
+      getMenuList(this.query).then((res) => {
+        if (res.data == null) {
+          Toast.fail("没有找到您要的菜哦");
+          this.query.menuName = "";
+        } else {
+          this.list = res.data;
+          this.refreshing = false;
+          this.loading = false;
+          this.finished = true;
+        }
+      });
+    },
   },
 };
 </script>
@@ -473,5 +505,14 @@ a {
   align-items: center;
   justify-content: center;
   height: 100%;
+}
+.van-list {
+  margin-bottom: 1.333333rem;
+  padding-left: 2rem;
+}
+.van-tree-select__nav {
+  top: 4.2rem;
+  position: fixed;
+  z-index: 999;
 }
 </style>

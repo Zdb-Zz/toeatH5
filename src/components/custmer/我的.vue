@@ -10,8 +10,8 @@
     <h2>爱仕达撒多</h2>
     <van-cell-group>
       <van-cell value="我的信息" is-link to="/custmer/个人信息" icon="manager" />
-      <van-cell value="我的订单" is-link to="/custmer/我的订单" icon="balance-list"/>
-      <van-cell value="我的收藏" is-link to="/custmer/我的收藏" icon="star"/>
+      <van-cell value="我的订单" is-link to="/custmer/我的订单" icon="balance-list" />
+      <van-cell value="我的收藏" is-link to="/custmer/我的收藏" icon="star" />
     </van-cell-group>
     <van-tabbar v-model="active">
       <van-tabbar-item icon="home-o" @click="storeList">商家列表</van-tabbar-item>
@@ -23,7 +23,7 @@
 
 <script>
 import router from "../../router";
-import { Dialog } from 'vant';
+import { Dialog } from "vant";
 
 export default {
   data() {
@@ -38,18 +38,18 @@ export default {
     mine() {
       router.push("/custmer/我的");
     },
-    outLogin(){
-    Dialog.confirm({
-        title: '注销',
-        message: '是否退出登录',
-        })
+    outLogin() {
+      Dialog.confirm({
+        title: "注销",
+        message: "是否退出登录",
+      })
         .then(() => {
-            router.push('/')
+          router.push("/");
         })
         .catch(() => {
-            // on cancel
+          // on cancel
         });
-    }
+    },
   },
 };
 </script>

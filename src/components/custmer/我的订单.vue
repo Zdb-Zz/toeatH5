@@ -1,6 +1,17 @@
 <template>
   <div>
-    <van-nav-bar title="我的订单" left-text="返回" @click-left="onClickLeft" class="formTop" />
+    <van-nav-bar
+      title="我的订单"
+      left-text="返回"
+      @click-left="onClickLeft"
+      right-text="一键支付"
+      @click-right="onClickRight"
+      class="formTop"
+    />
+    <van-dropdown-menu>
+      <van-dropdown-item v-model="value1" :options="option1" @change="getOrders()" />
+      <van-dropdown-item v-model="value2" :options="option2" @change="getOrders()" />
+    </van-dropdown-menu>
     <van-list>
       <van-cell
         class="cellList"
@@ -24,8 +35,20 @@
             />
           </template>
         </van-card>
-        <van-cell class="isJiesuan" v-if="item.orderState==0" :border="false" title="未支付" :style="{color: 'red'}"/>
-        <van-cell class="isJiesuan" v-if="item.orderState==1" :border="false" title="已支付" :style="{color: 'green'}"/>
+        <van-cell
+          class="isJiesuan"
+          v-if="item.orderState==0"
+          :border="false"
+          title="未支付"
+          :style="{color: 'red'}"
+        />
+        <van-cell
+          class="isJiesuan"
+          v-if="item.orderState==1"
+          :border="false"
+          title="已支付"
+          :style="{color: 'green'}"
+        />
         <van-button
           class="myButton"
           type="info"
@@ -58,11 +81,28 @@ export default {
         storeId: "",
       },
       list: [],
+      index: 0,
+      totalPrice: 0,
+
+      value1: 0,
+      value2: 0,
+      option1: [
+        { text: "全部订单", value: 0 },
+        { text: "已支付", value: 1 },
+        { text: "未支付", value: 2 },
+      ],
+      option2: [
+        { text: "默认排序", value: 0 },
+        { text: "时间顺序", value: 1 },
+        { text: "时间倒序", value: 2 },
+      ],
     };
   },
   created() {
     this.query.storeId = this.$route.query.storeId;
-    getOrders(this.query.storeId).then((res) => {
+    this.query.state = this.value1;
+    this.query.timeOrder = this.value2;
+    getOrders(this.query).then((res) => {
       console.log(res);
       this.list = res.data;
       this.list.forEach((element) => {
@@ -107,6 +147,31 @@ export default {
     toEvaluate() {
       event.stopPropagation();
     },
+    onClickRight() {
+      this.list.forEach((element) => {
+        if (element.orderState == 0) {
+          this.totalPrice += element.orderSumPrice;
+          this.index++;
+        }
+      });
+      console.log(this.totalPrice);
+      console.log(this.index);
+    },
+    getOrders() {
+      this.query.state = this.value1;
+      this.query.timeOrder = this.value2;
+      getOrders(this.query).then((res) => {
+        console.log(res);
+        this.list = res.data;
+        this.list.forEach((element) => {
+          element.menuString = "";
+          element.orderMenus.forEach((item) => {
+            element.menuString =
+              element.menuString + item.menuName + "×" + item.menuNum + " ";
+          });
+        });
+      });
+    },
   },
 };
 </script>
@@ -131,9 +196,6 @@ a {
 .loginForm {
   margin-top: 1rem;
 }
-.formTop {
-  margin-bottom: 1rem;
-}
 .price-bottom-class {
   font-size: 0.05rem;
   width: 2.7rem;
@@ -142,12 +204,11 @@ a {
   opacity: 1;
 }
 .isJiesuan {
-  z-index: 99;
+  z-index: 2;
   left: 80%;
   position: absolute;
   top: 0.2rem;
   background-color: rgba(0, 0, 0, 0);
-  
 }
 .myButton {
   float: right;
@@ -159,15 +220,18 @@ a {
 .card {
   background-color: rgba(0, 0, 0, 0);
 }
-.van-card__desc{
+.van-card__desc {
   width: 6.2rem;
 }
-.van-card__title{
-  color: #6466F7;
+.van-card__title {
+  color: #6466f7;
   font-size: 0.46rem;
   margin-bottom: 0.5rem;
 }
-.van-card__price{
+.van-card__price {
   color: #3357b9;
+}
+.van-dropdown-menu {
+  z-index: 99;
 }
 </style>
