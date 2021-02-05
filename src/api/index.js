@@ -150,10 +150,11 @@ export const delMenuById = menuId => {
 /**
  * 获取菜品类型
  */
-export const getMenuTypeList = () => {
+export const getMenuTypeList = query => {
     return request({
         url: '/back/menu/getMenuTypeList',
         method: 'get',
+        params:query
     });
 };
 
@@ -310,5 +311,27 @@ export const evaluateOrder =query => {
         url: '/back/order/evaluateOrder',
         method: "post",
         data:query
+    });
+};
+
+/**
+ * 修改类别
+ */
+export const editMenuType = query => {
+    return request({
+        url: '/back/menu/editMenuType',
+        method: "post",
+        data:query
+    });
+};
+
+/**
+ * 删除菜品类型
+ */
+export const delMenuType = (menuTypeId) => {
+    return request({
+        url: '/back/menu/delMenuType',
+        method: "get",
+        params:{menuTypeId}
     });
 };

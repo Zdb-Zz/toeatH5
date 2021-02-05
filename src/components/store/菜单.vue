@@ -1,6 +1,13 @@
 <template>
   <div>
-    <van-nav-bar title="菜单" right-text="新增菜品" @click-right="addMenuPannel" class="formTop" />
+    <van-nav-bar
+      title="菜单"
+      right-text="新增菜品"
+      @click-right="addMenuPannel"
+      left-text="编辑类别"
+      @click-left="editTypeShow = true"
+      class="formTop"
+    />
     <van-search
       v-model="food.menuName"
       show-action
@@ -21,7 +28,13 @@
     >
       <template #content>
         <van-empty description="暂无菜品" v-if="list==null" />
-        <van-list :finished="finished" finished-text="没有更多了" @load="onLoad" v-if="list!=null">
+        <van-list
+          class="menuList"
+          :finished="finished"
+          finished-text="没有更多了"
+          @load="onLoad"
+          v-if="list!=null"
+        >
           <van-cell v-for="item in list" :key="item.menuId">
             <van-card
               :price="item.priceAfterDiscount"
@@ -153,6 +166,13 @@
                 />
               </div>
             </div>
+            <van-field
+              v-model="food.menuText"
+              name="菜品描述"
+              label="菜品描述"
+              placeholder="菜品描述"
+              :rules="[{ required: true, message: '请填写菜品描述' }]"
+            />
           </van-form>
         </div>
       </div>
@@ -256,7 +276,58 @@
                 />
               </div>
             </div>
+            <van-field
+              v-model="food.menuText"
+              name="菜品描述"
+              label="菜品描述"
+              placeholder="菜品描述"
+              :rules="[{ required: true, message: '请填写菜品描述' }]"
+            />
           </van-form>
+        </div>
+      </div>
+    </van-popup>
+    <van-popup v-model="editTypeShow">
+      <div class="wrapper" @click.stop>
+        <div class="addMenu">
+          <van-form @submit="editType">
+            <van-nav-bar
+              title="编辑类别"
+              class="formTop"
+              left-text="取消"
+              right-text="提交"
+              @click-left="editTypeShow = false"
+              @click-right="editType"
+            />
+            <van-list :style="{width: '49%', display:'inline-block'}">
+              <van-cell title="类名" />
+              <van-field
+                class="typeField"
+                v-for="item in menuTypeList"
+                :key="item.menuTypeId"
+                v-model="item.menuTypeName"
+                input-align="center"
+                :style="{fontSize:'0.4rem'}"
+                placeholder="请输入类名"
+              />
+            </van-list>
+            <van-list :style="{width: '49%', display:'inline-block',fontSize:'0.1rem'}">
+              <van-cell title="权重" />
+              <van-field
+                v-for="item in menuTypeList"
+                :key="item.menuTypeId"
+                v-model="item.menuTypeWeight"
+                input-align="center"
+                placeholder="请输入权重（0-99）"
+                :style="{fontSize:'0.4rem'}"
+              >
+                <template #button>
+                  <van-icon name="clear" @click="delMenuType(item.menuTypeId)" />
+                </template>
+              </van-field>
+            </van-list>
+          </van-form>
+          <van-icon name="add" size="1rem" :style="{float:'right'}" @click="addType" />
         </div>
       </div>
     </van-popup>
@@ -273,6 +344,8 @@ import {
   delMenuById,
   getMenuTypeList,
   getMenuStringList,
+  editMenuType,
+  delMenuType,
 } from "../../api/index";
 import router from "../../router";
 import { Toast } from "vant";
@@ -312,6 +385,7 @@ export default {
         menuIsNice: "1", //招牌
         menuDiscount: 100, //折扣
         priceAfterDiscount: 0,
+        menuText: "",
       },
       list: [],
       loading: false,
@@ -328,16 +402,15 @@ export default {
       showPicker: false,
       active: 0,
       items: [],
+      editTypeShow: false,
     };
   },
   created() {
-    getMenuTypeList().then((res) => {
+    getMenuTypeList(this.query).then((res) => {
       this.menuTypeList = res.data;
-      console.log(res);
     });
     getMenuStringList(this.query).then((res) => {
       this.items = res.data;
-      console.log(this.items);
       this.query.menuType = this.items[this.active].menuTypeId;
       getMenuList(this.query).then((res) => {
         this.list = res.data;
@@ -412,6 +485,7 @@ export default {
           this.food.menuType = ""; //类型
           this.food.menuTypeDes = "";
           this.imgSrc = "";
+          this.food.menuText = "";
           this.onRefresh();
         } else {
           Toast.fail(res.message);
@@ -492,6 +566,7 @@ export default {
           this.food.menuFlavor = res.data.menuFlavor + ""; //口味
           this.food.menuIsNice = res.data.menuIsNice + ""; //招牌
           this.food.menuDiscount = res.data.menuDiscount + ""; //折扣
+          this.food.menuText = res.data.menuText;
           this.food.priceAfterDiscount = res.data.priceAfterDiscount; //折扣
           this.food.menuType = res.data.menuType;
           this.food.menuTypeDes = res.data.menuTypeDes;
@@ -516,6 +591,7 @@ export default {
           this.food.menuDiscount = "100"; //折扣
           this.food.menuType = "";
           this.food.menuTypeDes = "";
+          this.food.menuText = "";
           this.imgSrc = "";
           Toast.success(res.message);
         } else {
@@ -574,6 +650,7 @@ export default {
       this.food.menuType = "";
       this.food.menuTypeDes = "";
       this.imgSrc = "";
+      this.food.menuText = "";
       this.show = true;
     },
     onSearch() {
@@ -589,6 +666,53 @@ export default {
           this.finished = true;
         }
       });
+    },
+    editType() {
+      var index = 0;
+      console.log(this.menuTypeList);
+      this.menuTypeList.forEach((element) => {
+        if (element.menuTypeName == "" || element.menuTypeWeight == "") {
+          Toast.fail("请输入完整信息");
+          index = 1;
+        }
+      });
+      if (index == 0) {
+        var object = {};
+        object.array = this.menuTypeList;
+        object.storeId = this.query.storeId;
+        editMenuType(object).then((res) => {
+          getMenuTypeList(this.query).then((res) => {
+            this.menuTypeList = res.data;
+          });
+          getMenuStringList(this.query).then((res) => {
+            this.items = res.data;
+            this.query.menuType = this.items[this.active].menuTypeId;
+            getMenuList(this.query).then((res) => {
+              this.list = res.data;
+              console.log(this.list);
+            });
+          });
+        });
+      }
+    },
+    addType() {
+      this.menuTypeList.push({ menuTypeName: "", menuTypeWeight: "" });
+    },
+    delMenuType(menuTypeId) {
+      delMenuType(menuTypeId).then((res) => {
+        getMenuTypeList(this.query).then((res) => {
+            this.menuTypeList = res.data;
+          });
+          getMenuStringList(this.query).then((res) => {
+            this.items = res.data;
+            this.query.menuType = this.items[this.active].menuTypeId;
+            getMenuList(this.query).then((res) => {
+              this.list = res.data;
+              console.log(this.list);
+            });
+          });
+      });
+      
     },
   },
 };
@@ -726,7 +850,7 @@ a {
 .van-cell {
   font-size: 0.483333rem;
 }
-.van-list {
+.menuList {
   margin-bottom: 1.333333rem;
   padding-left: 2rem;
 }

@@ -197,7 +197,7 @@ a {
   margin-top: 1rem;
 }
 .price-bottom-class {
-  font-size: 0.05rem;
+  font-size: 0.3rem;
   width: 2.7rem;
   float: right;
   padding: 0;

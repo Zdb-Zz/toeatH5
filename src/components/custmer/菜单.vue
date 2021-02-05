@@ -2,7 +2,6 @@
   <div>
     <van-nav-bar
       title="菜单"
-      class="formTop"
       left-text="返回"
       @click-left="onClickLeft"
       right-text="智能点餐"
@@ -38,10 +37,15 @@
               @click="getMenuById(item.menuId)"
             >
               <template #desc>
-                <span>{{'销量：'+item.menuSales}}</span>
-                <br />
-                <span>{{'销量：'+item.menuSales}}</span>
-                <br />
+                <span v-show="item.menuText!=null" :style="{color:'red'}">
+                  {{item.menuText}}
+                  <br />
+                </span>
+
+                <span>
+                  {{'销量：'+item.menuSales}}
+                  <br />
+                </span>
               </template>
               <template #tag v-if="item.menuIsNice==1" v-show="true">
                 <van-tag plain type="danger">招牌</van-tag>
@@ -513,6 +517,10 @@ a {
 .van-tree-select__nav {
   top: 4.2rem;
   position: fixed;
-  z-index: 999;
+  z-index: 100;
+}
+
+.van-submit-bar__bar {
+  z-index: 200;
 }
 </style>
