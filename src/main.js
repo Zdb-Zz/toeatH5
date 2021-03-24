@@ -7,8 +7,11 @@ import 'lib-flexible/flexible.js'
 import Vant from 'vant';
 import 'vant/lib/index.css';
 import 'jquery'
+import echarts from 'echarts'
+
 Vue.use(Vant);
 Vue.config.productionTip = false
+Vue.prototype.$echarts = echarts
 
 /* eslint-disable no-new */
 new Vue({

@@ -27,6 +27,9 @@
         <van-button round block type="info" native-type="submit">提交</van-button>
       </div>
     </van-form>
+    客户端：zdb1  123
+    <br/>
+    商家端：zdb2  123
   </div>
 </template>
 
@@ -34,6 +37,7 @@
 import { login } from "../api/index";
 import { Toast } from "vant";
 import router from "../router";
+import Cookies from 'js-cookie'
 export default {
   data() {
     return {
@@ -58,9 +62,13 @@ export default {
             router.push("/admin/home");
           } else if (res.data.userType == 1) {
             //顾客登录
+            Cookies.set('userId', res.data.userId);
+            Cookies.set('storeId', res.data.userStore);
             router.push("/custmer/商家列表");
           } else if (res.data.userType == 2) {
             //商家登录
+            Cookies.set('userId', res.data.userId);
+            Cookies.set('storeId', res.data.userStore);
             router.push("/store/菜单");
           }
         } else {

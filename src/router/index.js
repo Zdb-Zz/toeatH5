@@ -9,13 +9,17 @@ import storeList from '../components/custmer/商家列表.vue'
 import mine from '../components/custmer/我的.vue'
 import register from '@/components/register'
 import storeCenter from '@/components/store/商家中心.vue'
+import storeData from '@/components/store/商家信息.vue'
 import chart from '@/components/store/统计.vue'
 import toMenu from '@/components/custmer/菜单'
 import personalDate from '@/components/custmer/个人信息'
 import mineOrder from '@/components/custmer/我的订单'
+import storeOrder from '@/components/store/订单管理'
 import mineCollect from '@/components/custmer/我的收藏'
 import orderSubmit from '@/components/custmer/订单提交页'
 import orderDetail from '@/components/custmer/订单详情页'
+import orderDetailStore from '@/components/store/订单详情页'
+import orderPay from '@/components/custmer/订单支付页'
 
 Vue.use(Router)
 
@@ -108,5 +112,25 @@ export default new Router({
       name: '订单详情',
       component: orderDetail,
     },
+    {
+      path: '/store/订单详情页',
+      name: '订单详情',
+      component: orderDetailStore,
+    },
+    {
+      path: '/custmer/订单支付页',
+      name: '订单支付',
+      component: orderPay,
+    },
+    {
+      path: '/store/商家信息',
+      name: '商家信息',
+      component: storeData,
+    },
+    {
+      path: '/store/订单管理',
+      name: '订单管理',
+      component: storeOrder,
+    }
   ]
 })

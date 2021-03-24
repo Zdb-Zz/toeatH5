@@ -80,9 +80,9 @@
                   min="0"
                   default-value="0"
                   show-input
-                  long-press
-                  @plus="addMenuNum(item.menuId)"
-                  @minus="subMenuNum(item.menuId)"
+                  @plus="addMenuNum(item)"
+                  @minus="subMenuNum(item)"
+                  theme="round"
                 />
               </template>
             </van-card>
@@ -138,15 +138,15 @@
               default-value="0"
               show-input
               long-press
-              @plus="addMenuNum(item.menuId)"
-              @minus="subMenuNum(item.menuId)"
+              @plus="addMenuNum(item)"
+              @minus="subMenuNum(item)"
             />
           </van-cell>
         </van-list>
         <van-submit-bar :price="totalPrice" button-text="生成订单" @submit="onSubmit" />
       </van-popup>
     </van-submit-bar>
-    <van-popup v-model="menuShow" closeable position="bottom" :style="{ height: '100%'}">内容</van-popup>
+
     <van-popup v-model="recommendShow" :style="{width:'90%', height: '75%'}">
       <van-nav-bar
         title="推荐菜单"
@@ -176,8 +176,8 @@
               default-value="0"
               show-input
               long-press
-              @plus="addMenuNum(item.menuId)"
-              @minus="subMenuNum(item.menuId)"
+              @plus="addMenuNum(item)"
+              @minus="subMenuNum(item)"
             />
           </template>
         </van-card>
@@ -315,9 +315,10 @@ export default {
         Toast.fail("购物车为空哦");
       }
     },
-    subMenuNum(menuId) {
+    subMenuNum(item) {
       event.stopPropagation();
-      subMenuNum(menuId).then((res) => {
+      item.menuNum--;
+      subMenuNum(item.menuId).then((res) => {
         getTotalPrice().then((res) => {
           this.totalPrice = res.data * 100;
           console.log(this.totalPrice);
@@ -336,9 +337,10 @@ export default {
         });
       });
     },
-    addMenuNum(menuId) {
+    addMenuNum(item) {
       event.stopPropagation();
-      addMenuNum(menuId).then((res) => {
+      item.menuNum++;
+      addMenuNum(item.menuId).then((res) => {
         getTotalPrice().then((res) => {
           this.totalPrice = res.data * 100;
           console.log(this.totalPrice);

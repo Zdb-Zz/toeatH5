@@ -23,12 +23,21 @@
     <van-pull-refresh v-model="refreshing" @refresh="onRefresh">
       <van-list :finished="finished" finished-text="没有更多了" @load="onLoad">
         <van-cell v-for="item in stores" :key="item.storeId">
-          <van-card
-            :desc="item.storeName"
-            :title="item.storeName"
-            thumb="https://img.yzcdn.cn/vant/ipad.jpeg"
-            @click="toMenu(item.storeId)"
-          />
+          <van-card :title="item.storeName" :thumb="item.storeImg" @click="toMenu(item.storeId)">
+            <template #desc>
+              <span v-show="item.storeAddress!=null" :style="{color:'red'}">
+                {{'地址：'+item.storeAddress}}
+                <br />
+              </span>
+              <span>
+                {{'简介：'+item.storeRemark}}
+                <br />
+              </span>
+            </template>
+            <template #footer>
+              <van-rate v-model="item.storeStar" :count="5" />
+            </template>
+          </van-card>
         </van-cell>
       </van-list>
     </van-pull-refresh>
@@ -54,15 +63,15 @@ export default {
       finished: false,
       refreshing: false,
       stores: [],
-      show:true
+      show: true,
     };
   },
   created() {
     getStoreList().then((res) => {
-      if(res.code==1){
-        this.show=false
-      }else{
-         this.show=false
+      if (res.code == 1) {
+        this.show = false;
+      } else {
+        this.show = false;
       }
       this.stores = res.data;
       console.log(res);
@@ -136,5 +145,10 @@ a {
 }
 .loginForm {
   margin-top: 1rem;
+}
+.van-card__title {
+  font-size: 0.43rem;
+  font-weight: 1000;
+  line-height: 0.43rem;
 }
 </style>

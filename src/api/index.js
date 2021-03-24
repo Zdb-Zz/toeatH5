@@ -68,6 +68,18 @@ export const createStore = query => {
         data:query
     });
 };
+
+/**
+ * 创建商家
+ */
+export const editStore = query => {
+    return request({
+        url: '/back/store/editStore',
+        method: 'post',
+        data:query
+    });
+};
+
 /**
  * 获取菜品列表
  * @param  query 
@@ -291,7 +303,16 @@ export const getOrders = query => {
         params:query
     });
 };
-
+/**
+ * 获取订单列表
+ */
+export const getStoreOrders = query => {
+    return request({
+        url: '/back/order/getStoreOrders',
+        method: "get",
+        params:query
+    });
+};
 /**
  * 获取订单详情
  */
@@ -333,5 +354,57 @@ export const delMenuType = (menuTypeId) => {
         url: '/back/menu/delMenuType',
         method: "get",
         params:{menuTypeId}
+    });
+};
+
+/**
+ * 删除菜品类型
+ */
+export const payOrder = (orderId) => {
+    return request({
+        url: '/back/order/payOrder',
+        method: "get",
+        params:{orderId}
+    });
+};
+/**
+ * 获取今日营业状况
+ */
+export const todayBusiness = (storeId) => {
+    return request({
+        url: '/back/statistics/todayBusiness',
+        method: "get",
+        params:{storeId}
+    });
+};
+/**
+ * 获取销量排行
+ */
+export const getSalesRank = query => {
+    return request({
+        url: '/back/statistics/salesRank',
+        method: "get",
+        params:query
+    });
+};
+
+/**
+ * 获取销量排行
+ */
+export const salesRankByTime = query => {
+    return request({
+        url: '/back/statistics/salesRankByTime',
+        method: "get",
+        params:query
+    });
+};
+/**
+ * 获取销量排行
+ */
+export const totalBusiness = query => {
+    return request({
+        url: '/back/statistics/totalBusiness',
+        method: "get",
+        params:query
     });
 };

@@ -1,14 +1,9 @@
 <template>
   <div>
-    <van-nav-bar
-      title="我的订单"
-      left-text="返回"
-      @click-left="onClickLeft"
-      class="formTop"
-    />
+    <van-nav-bar title="订单管理" left-text="返回" @click-left="onClickLeft" class="formTop" />
     <van-dropdown-menu>
-      <van-dropdown-item v-model="value1" :options="option1" @change="getOrders()" />
-      <van-dropdown-item v-model="value2" :options="option2" @change="getOrders()" />
+      <van-dropdown-item v-model="value1" :options="option1" @change="getStoreOrders()" />
+      <van-dropdown-item v-model="value2" :options="option2" @change="getStoreOrders()" />
     </van-dropdown-menu>
     <van-list>
       <van-cell
@@ -47,22 +42,6 @@
           title="已支付"
           :style="{color: 'green'}"
         />
-        <van-button
-          class="myButton"
-          type="info"
-          v-if="item.orderState==0"
-          size="small"
-          round
-          @click="toPay(item.orderId)"
-        >去支付</van-button>
-        <van-button
-          class="myButton"
-          type="primary"
-          v-if="item.orderState==1"
-          size="small"
-          round
-          @click="toEvaluate(item.orderId)"
-        >去评价</van-button>
       </van-cell>
     </van-list>
   </div>
@@ -70,7 +49,7 @@
 
 <script>
 import router from "../../router";
-import { getOrders } from "../../api/index";
+import { getStoreOrders } from "../../api/index";
 
 export default {
   data() {
@@ -100,7 +79,7 @@ export default {
     this.query.storeId = this.$route.query.storeId;
     this.query.state = this.value1;
     this.query.timeOrder = this.value2;
-    getOrders(this.query).then((res) => {
+    getStoreOrders(this.query).then((res) => {
       console.log(res);
       this.list = res.data;
       this.list.forEach((element) => {
@@ -115,62 +94,27 @@ export default {
   },
   methods: {
     onClickLeft() {
-      if (this.query.storeId == null || this.query.storeId == "") {
-        this.$router.push({
-          path: "/custmer/我的",
-          query: {
-            storeId: this.query.storeId,
-          },
-        });
-      } else {
-        this.$router.push({
-          path: "/custmer/菜单",
-          query: {
-            storeId: this.query.storeId,
-          },
-        });
-      }
+      this.$router.push({
+        path: "/store/商家中心",
+        query: {
+          storeId: this.query.storeId,
+        },
+      });
     },
+
     orderDetail(orderId) {
       this.$router.push({
-        path: "/custmer/订单详情页",
+        path: "/store/订单详情页",
         query: {
           orderId: orderId,
         },
       });
     },
-    toPay(orderId) {
-      event.stopPropagation();
-      this.$router.push({
-        path: "/custmer/订单支付页",
-        query: {
-          orderId: orderId,
-        },
-      });
-    },
-    toEvaluate(orderId) {
-      event.stopPropagation();
-      this.$router.push({
-        path: "/custmer/订单详情页",
-        query: {
-          orderId: orderId,
-        },
-      });
-    },
-    // onClickRight() {
-    //   this.list.forEach((element) => {
-    //     if (element.orderState == 0) {
-    //       this.totalPrice += element.orderSumPrice;
-    //       this.index++;
-    //     }
-    //   });
-    //   console.log(this.totalPrice);
-    //   console.log(this.index);
-    // },
-    getOrders() {
+
+    getStoreOrders() {
       this.query.state = this.value1;
       this.query.timeOrder = this.value2;
-      getOrders(this.query).then((res) => {
+      getStoreOrders(this.query).then((res) => {
         console.log(res);
         this.list = res.data;
         this.list.forEach((element) => {

@@ -9,12 +9,29 @@
           :title="item.menuName"
           :thumb="item.menuImg"
           :desc="'商家：'+item.storeName"
+          @click="gotoStore(item.menuStoreId)"
         >
           <template #tags>
             <van-tag plain type="danger" v-if="item.menuFlavor==1" v-show="true">不辣</van-tag>
             <van-tag plain type="danger" v-if="item.menuFlavor==2" v-show="true">微辣</van-tag>
             <van-tag plain type="danger" v-if="item.menuFlavor==3" v-show="true">中辣</van-tag>
             <van-tag plain type="danger" v-if="item.menuFlavor==4" v-show="true">特辣</van-tag>
+            <van-icon
+              name="star"
+              class="collectIcon"
+              color="#FF6600"
+              size="0.6rem"
+              @click="item.isCollect=!item.isCollect,unCollectMenu(item.menuId)"
+              v-if="item.isCollect"
+            />
+            <van-icon
+              name="star-o"
+              class="collectIcon"
+              color="#FF6600"
+              size="0.6rem"
+              @click="item.isCollect=!item.isCollect,collectMenu(item.menuId)"
+              v-if="!item.isCollect"
+            />
           </template>
         </van-card>
       </van-cell>
@@ -23,8 +40,9 @@
 </template>
 
 <script>
+import { Toast } from "vant";
 import router from "../../router";
-import { getCollectList } from "../../api/index";
+import { getCollectList, unCollectMenu, collectMenu } from "../../api/index";
 export default {
   data() {
     return {
@@ -40,6 +58,38 @@ export default {
   methods: {
     onClickLeft() {
       router.push("/custmer/我的");
+    },
+    collectMenu(menuId) {
+      event.stopPropagation();
+      collectMenu(menuId).then((res) => {
+        console.log(res);
+        if (res.code == 1) {
+          Toast.success("收藏成功");
+        } else if (res.code == 3) {
+          Toast.fail("收藏失败");
+        }
+      });
+      console.log("收藏" + menuId);
+    },
+    unCollectMenu(menuId) {
+      event.stopPropagation();
+      unCollectMenu(menuId).then((res) => {
+        console.log(res);
+        if (res.code == 1) {
+          Toast.success("取消收藏成功");
+        } else if (res.code == 3) {
+          Toast.fail("取消收藏失败");
+        }
+      });
+      console.log("取消收藏" + menuId);
+    },
+    gotoStore(storeId) {
+      this.$router.push({
+        path: "/custmer/菜单",
+        query: {
+          storeId: storeId,
+        },
+      });
     },
   },
 };
@@ -80,5 +130,9 @@ a {
   max-height: 1.853333rem;
   font-weight: 500;
   line-height: 0.926667rem;
+}
+.van-icon {
+  position: relative;
+  float: right;
 }
 </style>

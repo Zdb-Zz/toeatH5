@@ -7,7 +7,7 @@
       fit="cover"
       src="https://img01.yzcdn.cn/vant/cat.jpeg"
     />
-    <h2>爱仕达撒多</h2>
+    <h2>{{user.userName}}</h2>
     <van-cell-group>
       <van-cell value="我的信息" is-link to="/custmer/个人信息" icon="manager" />
       <van-cell value="我的订单" is-link to="/custmer/我的订单" icon="balance-list" />
@@ -24,12 +24,19 @@
 <script>
 import router from "../../router";
 import { Dialog } from "vant";
+import { findUser, editUser} from "../../api/index";
 
 export default {
   data() {
     return {
       active: 1,
+       user: {},
     };
+  },
+  created() {
+    findUser().then((res) => {
+      this.user = res.data;
+    });
   },
   methods: {
     storeList() {
