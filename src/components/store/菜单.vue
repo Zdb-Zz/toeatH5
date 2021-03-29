@@ -297,7 +297,7 @@
               left-text="取消"
               right-text="提交"
               @click-left="editTypeShow = false"
-              @click-right="editType"
+              @click-right="editType,editTypeShow = false"
             />
             <van-list :style="{width: '49%', display:'inline-block'}">
               <van-cell title="类名" />
@@ -350,6 +350,7 @@ import {
 import router from "../../router";
 import { Toast } from "vant";
 import { Dialog } from "vant";
+import Cookies from "js-cookie";
 export default {
   props: {
     value: {
@@ -406,6 +407,7 @@ export default {
     };
   },
   created() {
+    this.query.storeId = Cookies.get("storeId");
     getMenuTypeList(this.query).then((res) => {
       this.menuTypeList = res.data;
     });
@@ -422,13 +424,14 @@ export default {
     getStoreByUser().then((res) => {
       if (res.data == null) {
         router.push("/store/创建商家");
+      } else {
+        this.query.storeId = res.data.storeId;
+        this.food.menuStoreId = res.data.storeId;
+        getMenuList(this.query).then((res) => {
+          console.log(res);
+          this.list = res.data;
+        });
       }
-      this.query.storeId = res.data.storeId;
-      this.food.menuStoreId = res.data.storeId;
-      getMenuList(this.query).then((res) => {
-        console.log(res);
-        this.list = res.data;
-      });
     });
   },
   methods: {
@@ -701,18 +704,17 @@ export default {
     delMenuType(menuTypeId) {
       delMenuType(menuTypeId).then((res) => {
         getMenuTypeList(this.query).then((res) => {
-            this.menuTypeList = res.data;
+          this.menuTypeList = res.data;
+        });
+        getMenuStringList(this.query).then((res) => {
+          this.items = res.data;
+          this.query.menuType = this.items[this.active].menuTypeId;
+          getMenuList(this.query).then((res) => {
+            this.list = res.data;
+            console.log(this.list);
           });
-          getMenuStringList(this.query).then((res) => {
-            this.items = res.data;
-            this.query.menuType = this.items[this.active].menuTypeId;
-            getMenuList(this.query).then((res) => {
-              this.list = res.data;
-              console.log(this.list);
-            });
-          });
+        });
       });
-      
     },
   },
 };

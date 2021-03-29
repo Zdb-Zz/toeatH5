@@ -17,7 +17,7 @@
           class="card"
           :price="item.orderSumPrice"
           :desc="item.menuString"
-          :title="item.storeName"
+          :title="item.userName+':\t'+item.userPhone"
         >
           <template #price-top>
             <van-cell

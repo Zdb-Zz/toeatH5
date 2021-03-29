@@ -4,7 +4,7 @@
       title="菜单"
       left-text="返回"
       @click-left="onClickLeft"
-      right-text="智能点餐"
+      right-text="智能推荐点餐"
       @click-right="onClickRight"
     />
     <van-search
