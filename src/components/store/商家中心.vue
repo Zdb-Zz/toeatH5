@@ -1,12 +1,6 @@
 <template>
   <div>
-    <van-image
-      round
-      width="2.5rem"
-      height="2.5rem"
-      fit="cover"
-      :src="store.storeImg"
-    />
+    <van-image round width="2.5rem" height="2.5rem" fit="cover" :src="store.storeImg" />
     <h2>{{store.storeName}}</h2>
     <van-cell-group>
       <van-cell value="商家信息" is-link to="/store/商家信息" icon="manager" />
@@ -23,20 +17,34 @@
 
 <script>
 import router from "../../router";
-import { getStoreByUser,editStore} from "../../api/index";
-import { Dialog } from "vant";
+import { getStoreByUser, editStore } from "../../api/index";
+import { Dialog, Notify } from "vant";
+import Cookies from "js-cookie";
 
 export default {
   data() {
     return {
-      store:{},
+      store: {},
       active: 2,
+      shopId: "",
     };
   },
- created() {
+  created() {
+    this.store.storeId = Cookies.get("storeId");
+    this.initWebSocket();
     getStoreByUser().then((res) => {
       this.store = res.data;
+      Notify({ type: "primary", message: "您有"+this.store.storeNotify+"条新的订单，请尽快处理" });
     });
+  },
+  destroyed: function () {
+    // 离开页面生命周期函数
+    this.websocketclose();
+  },
+  mounted() {
+    // 主要通知
+    console.log(this.store)
+    Notify({ type: "primary", message: "您有"+this.store.storeNotify+"条新的订单，请尽快处理" });
   },
   methods: {
     menu() {
@@ -59,6 +67,37 @@ export default {
         .catch(() => {
           // on cancel
         });
+    },
+    collapse: function () {
+      this.isCollapse = !this.isCollapse;
+      if (this.isCollapse) {
+        this.iconClass = "cebianlanzhankai";
+      } else {
+        this.iconClass = "cebianlanshouhui";
+      }
+    },
+    initWebSocket: function () {
+      // WebSocket与普通的请求所用协议有所不同，ws等同于http，wss等同于https
+      // this.websock = new WebSocket("ws://121.4.60.27:3000/websocket/DPS007");
+      this.websock = new WebSocket("ws://localhost:3000/websocket/DPS007");
+      this.websock.onopen = this.websocketonopen;
+      this.websock.onerror = this.websocketonerror;
+      this.websock.onmessage = this.websocketonmessage;
+      this.websock.onclose = this.websocketclose;
+    },
+    websocketonopen: function () {
+      console.log("WebSocket连接成功");
+    },
+    websocketonerror: function (e) {
+      console.log("WebSocket连接发生错误");
+    },
+    websocketonmessage: function (e) {
+      console.log(e.data);
+      Notify({ type: "primary", message: "您有"+e.data+"条新的订单，请尽快处理" });
+      this.message = e;
+    },
+    websocketclose: function (e) {
+      console.log("connection closed (" + e + ")");
     },
   },
 };

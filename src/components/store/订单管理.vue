@@ -30,16 +30,16 @@
         </van-card>
         <van-cell
           class="isJiesuan"
-          v-if="item.orderState==0"
+          v-if="item.isComplete==0"
           :border="false"
-          title="未支付"
+          title="未完成"
           :style="{color: 'red'}"
         />
         <van-cell
           class="isJiesuan"
-          v-if="item.orderState==1"
+          v-if="item.isComplete==1"
           :border="false"
-          title="已支付"
+          title="已完成"
           :style="{color: 'green'}"
         />
       </van-cell>
@@ -50,7 +50,7 @@
 <script>
 import router from "../../router";
 import { getStoreOrders } from "../../api/index";
-
+import Cookies from "js-cookie";
 export default {
   data() {
     return {
@@ -76,7 +76,7 @@ export default {
     };
   },
   created() {
-    this.query.storeId = this.$route.query.storeId;
+    this.query.storeId = Cookies.get("storeId");
     this.query.state = this.value1;
     this.query.timeOrder = this.value2;
     getStoreOrders(this.query).then((res) => {

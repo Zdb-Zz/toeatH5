@@ -131,6 +131,7 @@ export default new Router({
       path: '/store/订单管理',
       name: '订单管理',
       component: storeOrder,
-    }
+    },
+    
   ]
 })

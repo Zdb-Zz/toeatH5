@@ -246,10 +246,11 @@ export const unCollectMenu = (menuId) => {
 /**
  * 获取推荐列表
  */
-export const getRecommendList = () => {
+export const getRecommendList = (storeId) => {
     return request({
         url: '/back/menu/getRecommendList',
         method: 'get',
+        params:{storeId}
     });
 };
 
@@ -406,5 +407,22 @@ export const totalBusiness = query => {
         url: '/back/statistics/totalBusiness',
         method: "get",
         params:query
+    });
+};
+
+
+ export const sendAllWebSocket = (storeId) => {
+    return request({
+        url: '/back/store/sendAllWebSocket',
+        method: "get",
+        params:{storeId}
+    });
+};
+
+ export const completeMenu = (orderMenuId) => {
+    return request({
+        url: '/back/order/completeMenu',
+        method: "get",
+        params:{orderMenuId}
     });
 };

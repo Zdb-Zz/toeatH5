@@ -41,7 +41,7 @@
 
 <script>
 import router from "../../router";
-import { getShopCarList, getTotalPrice,submitOrder } from "../../api/index";
+import { getShopCarList, getTotalPrice,submitOrder,sendAllWebSocket} from "../../api/index";
 export default {
   data() {
     return {
@@ -86,7 +86,8 @@ export default {
         },
       });
       })
-      
+      sendAllWebSocket(this.query.storeId).then((res)=>{
+      })
     },
   },
 };

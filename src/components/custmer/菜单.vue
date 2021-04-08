@@ -394,7 +394,8 @@ export default {
       router.push("/custmer/商家列表");
     },
     onClickRight() {
-      getRecommendList().then((res) => {
+      console.log(this.query.storeId)
+      getRecommendList(this.query.storeId).then((res) => {
         this.recommendList = res.data;
         console.log(res);
       });

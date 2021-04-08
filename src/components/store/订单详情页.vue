@@ -24,6 +24,11 @@
             <span class="custom-title" v-if="item.menuPepper==2">中辣</span>
             <span class="custom-title" v-if="item.menuPepper==3">特辣</span>
           </template>
+          <template #icon >
+            <van-icon name="success"  v-if="item.orderMenuState==1"/>
+            <van-icon name="circle" v-if="item.orderMenuState==0" @click="completeMenu(item),item.orderMenuState=1"/>
+          </template>
+          
         </van-cell>
         <van-cell :title="'总价:'" :value="'￥'+order.orderSumPrice" />
       </van-list>
@@ -63,7 +68,7 @@
 import router from "../../router";
 import { Toast } from "vant";
 
-import { getOrderById, evaluateOrder } from "../../api/index";
+import { getOrderById, evaluateOrder,completeMenu } from "../../api/index";
 export default {
   data() {
     return {
@@ -89,6 +94,8 @@ export default {
       this.menuList = res.data.orderMenus;
     });
   },
+   mounted(){
+  },
   methods: {
     onClickLeftToMenu() {
       this.$router.push({
@@ -104,6 +111,14 @@ export default {
         path: "/store/订单管理",
       });
     },
+    onSubmit() {
+      evaluateOrder(this.query).then((res) => {});
+    },
+    completeMenu(item){
+      completeMenu(item.orderMenuId).then((res)=>{
+
+      })
+    }
   },
 };
 </script>
