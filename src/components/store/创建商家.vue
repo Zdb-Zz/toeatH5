@@ -20,14 +20,14 @@
       placeholder="商家信息"
       :rules="[{ required: true, message: '商家信息' }]"
     />
-    <van-field name="radio" label="营业状态">
+    <!-- <van-field name="radio" label="营业状态">
       <template #input>
         <van-radio-group v-model="query.storeState" direction="horizontal">
           <van-radio name="1">正在营业</van-radio>
           <van-radio name="0">未营业</van-radio>
         </van-radio-group>
       </template>
-    </van-field>
+    </van-field> -->
     <van-field
       v-model="query.storeAddress"
       name="商家地址"
@@ -44,7 +44,7 @@
           </van-image>
         </div>
         <div class="upDiv">
-          修改头像
+          修改图片
           <input
             ref="uploadInput"
             type="file"

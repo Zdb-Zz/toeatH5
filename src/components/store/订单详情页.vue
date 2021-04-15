@@ -37,6 +37,17 @@
     <div class="evaluate">
       <van-form @submit="onSubmit">
         <van-field
+          v-model="order.orderRemark"
+          rows="2"
+          autosize
+          disabled
+          label="用餐备注"
+          type="textarea"
+          maxlength="50"
+          show-word-limit
+          class="remarkClass"
+        />
+        <van-field
           v-model="order.orderEvaluate"
           rows="2"
           autosize

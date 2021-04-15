@@ -10,6 +10,7 @@
     />
     <van-form @submit="onSubmit">
       <van-field :disabled="isReadonly"  v-model="user.userName" label="用户名" />
+      <van-field :disabled="isReadonly"  type="password" v-model="user.userPassWord" label="密码" />
       <van-field :disabled="isReadonly" v-model="user.userNick" label="昵称" />
       <van-field :disabled="isReadonly" v-model="user.userSex" label="性别" />
       <van-field :disabled="isReadonly" v-model="user.userPhone" label="联系方式" />
@@ -21,7 +22,7 @@
         v-if="user.userStore!=null"
       />
       <div style="margin: 16px;">
-        <van-button v-if="isSubmitShow" round block type="info" native-type="submit">保存</van-button>
+        <van-button v-if="isSubmitShow" round block type="info" native-type="submit" >保存</van-button>
       </div>
     </van-form>
   </div>

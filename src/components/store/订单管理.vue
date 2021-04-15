@@ -29,20 +29,35 @@
           </template>
         </van-card>
         <van-cell
-          class="isJiesuan"
+          class="isJiesuan1"
           v-if="item.isComplete==0"
           :border="false"
-          title="未完成"
+          title="菜单未完成"
+          :style="{color: 'red'}"
+        />
+        <van-cell
+          class="isJiesuan1"
+          v-if="item.isComplete==1"
+          :border="false"
+          title="菜单已完成"
+          :style="{color: 'green'}"
+        />
+        <van-cell
+          class="isJiesuan"
+          v-if="item.orderState==0"
+          :border="false"
+          title="顾客未支付"
           :style="{color: 'red'}"
         />
         <van-cell
           class="isJiesuan"
-          v-if="item.isComplete==1"
+          v-if="item.orderState==1"
           :border="false"
-          title="已完成"
+          title="顾客已支付"
           :style="{color: 'green'}"
         />
       </van-cell>
+      
     </van-list>
   </div>
 </template>
@@ -157,11 +172,18 @@ a {
   padding: 0;
   opacity: 1;
 }
-.isJiesuan {
+.isJiesuan1 {
   z-index: 2;
-  left: 80%;
+  left: 70%;
   position: absolute;
   top: 0.2rem;
+  background-color: rgba(0, 0, 0, 0);
+}
+.isJiesuan {
+  z-index: 2;
+  left: 70%;
+  position: absolute;
+  top: 01rem;
   background-color: rgba(0, 0, 0, 0);
 }
 .myButton {

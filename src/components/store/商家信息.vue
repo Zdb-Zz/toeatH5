@@ -21,7 +21,7 @@
           </van-image>
         </div>
         <div class="upDiv">
-          修改头像
+          修改图片
           <input
             ref="uploadInput"
             type="file"
