@@ -5,7 +5,7 @@
       <van-dropdown-item v-model="value1" :options="option1" @change="getStoreOrders()" />
       <van-dropdown-item v-model="value2" :options="option2" @change="getStoreOrders()" />
     </van-dropdown-menu>
-    <van-list>
+    <van-list v-model="loading" :finished="finished" finished-text="没有更多了" @load="onLoad()">
       <van-cell
         class="cellList"
         v-for="item in list"
@@ -57,7 +57,6 @@
           :style="{color: 'green'}"
         />
       </van-cell>
-      
     </van-list>
   </div>
 </template>
@@ -71,11 +70,14 @@ export default {
     return {
       query: {
         storeId: "",
+        pageIndex: 1,
+        pageSize: 10,
       },
       list: [],
       index: 0,
       totalPrice: 0,
-
+      loading: false,
+      finished: false,
       value1: 0,
       value2: 0,
       option1: [
@@ -108,6 +110,25 @@ export default {
     console.log(this.list);
   },
   methods: {
+    onLoad() {
+      getStoreOrders(this.query).then((res) => {
+        console.log(res);
+        res.data.forEach((element) => {
+          element.menuString = "";
+          element.orderMenus.forEach((item) => {
+            element.menuString =
+              element.menuString + item.menuName + "×" + item.menuNum + " ";
+          });
+          this.list.push(element);
+        });
+        this.loading = false;
+        this.query.pageIndex = this.query.pageIndex + 1;
+        if (res.data.length < this.query.pageSize) {
+          this.finished = true;
+          this.loading = false;
+        }
+      });
+    },
     onClickLeft() {
       this.$router.push({
         path: "/store/商家中心",
@@ -167,7 +188,7 @@ a {
 }
 .price-bottom-class {
   font-size: 0.3rem;
-  width: 2.7rem;
+  width: 3.5rem;
   float: right;
   padding: 0;
   opacity: 1;

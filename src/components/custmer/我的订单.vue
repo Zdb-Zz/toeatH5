@@ -1,16 +1,11 @@
 <template>
   <div>
-    <van-nav-bar
-      title="我的订单"
-      left-text="返回"
-      @click-left="onClickLeft"
-      class="formTop"
-    />
+    <van-nav-bar title="我的订单" left-text="返回" @click-left="onClickLeft" class="formTop" />
     <van-dropdown-menu>
       <van-dropdown-item v-model="value1" :options="option1" @change="getOrders()" />
       <van-dropdown-item v-model="value2" :options="option2" @change="getOrders()" />
     </van-dropdown-menu>
-    <van-list>
+    <van-list v-model="loading" :finished="finished" finished-text="没有更多了" @load="onLoad()">
       <van-cell
         class="cellList"
         v-for="item in list"
@@ -77,11 +72,14 @@ export default {
     return {
       query: {
         storeId: "",
+        pageIndex: 1,
+        pageSize: 10,
       },
       list: [],
       index: 0,
       totalPrice: 0,
-
+      loading: false,
+      finished: false,
       value1: 0,
       value2: 0,
       option1: [
@@ -114,6 +112,25 @@ export default {
     console.log(this.list);
   },
   methods: {
+    onLoad() {
+      getOrders(this.query).then((res) => {
+        console.log(res);
+        res.data.forEach((element) => {
+          element.menuString = "";
+          element.orderMenus.forEach((item) => {
+            element.menuString =
+              element.menuString + item.menuName + "×" + item.menuNum + " ";
+          });
+          this.list.push(element);
+        });
+        this.loading = false;
+        this.query.pageIndex = this.query.pageIndex + 1;
+        if (res.data.length < this.query.pageSize) {
+          this.finished = true;
+          this.loading = false;
+        }
+      });
+    },
     onClickLeft() {
       if (this.query.storeId == null || this.query.storeId == "") {
         this.$router.push({
@@ -170,6 +187,7 @@ export default {
     getOrders() {
       this.query.state = this.value1;
       this.query.timeOrder = this.value2;
+      this.query.pageIndex = 1;
       getOrders(this.query).then((res) => {
         console.log(res);
         this.list = res.data;
@@ -208,7 +226,7 @@ a {
 }
 .price-bottom-class {
   font-size: 0.3rem;
-  width: 2.7rem;
+  width: 3.5rem;
   float: right;
   padding: 0;
   opacity: 1;
