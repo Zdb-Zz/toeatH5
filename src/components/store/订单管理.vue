@@ -148,8 +148,10 @@ export default {
     },
 
     getStoreOrders() {
+      this.finished=false
       this.query.state = this.value1;
       this.query.timeOrder = this.value2;
+      this.query.pageIndex=1
       getStoreOrders(this.query).then((res) => {
         console.log(res);
         this.list = res.data;

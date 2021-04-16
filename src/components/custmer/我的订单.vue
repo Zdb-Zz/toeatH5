@@ -98,21 +98,12 @@ export default {
     this.query.storeId = this.$route.query.storeId;
     this.query.state = this.value1;
     this.query.timeOrder = this.value2;
-    getOrders(this.query).then((res) => {
-      console.log(res);
-      this.list = res.data;
-      this.list.forEach((element) => {
-        element.menuString = "";
-        element.orderMenus.forEach((item) => {
-          element.menuString =
-            element.menuString + item.menuName + "×" + item.menuNum + " ";
-        });
-      });
-    });
-    console.log(this.list);
+    this.query.pageIndex = 1;
+    console.log(this.query);
   },
   methods: {
     onLoad() {
+      console.log(this.list);
       getOrders(this.query).then((res) => {
         console.log(res);
         res.data.forEach((element) => {
@@ -124,10 +115,11 @@ export default {
           this.list.push(element);
         });
         this.loading = false;
-        this.query.pageIndex = this.query.pageIndex + 1;
         if (res.data.length < this.query.pageSize) {
           this.finished = true;
           this.loading = false;
+        } else {
+          this.query.pageIndex = this.query.pageIndex + 1;
         }
       });
     },
@@ -185,6 +177,7 @@ export default {
     //   console.log(this.index);
     // },
     getOrders() {
+      this.finished=false
       this.query.state = this.value1;
       this.query.timeOrder = this.value2;
       this.query.pageIndex = 1;
