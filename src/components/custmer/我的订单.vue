@@ -177,7 +177,7 @@ export default {
     //   console.log(this.index);
     // },
     getOrders() {
-      this.finished=false
+      this.finished = false;
       this.query.state = this.value1;
       this.query.timeOrder = this.value2;
       this.query.pageIndex = 1;
@@ -236,7 +236,13 @@ a {
 }
 .cellList {
   margin-bottom: 0.4rem;
-  background-color: rgba(125, 236, 255, 0.096);
+  border-radius: 0.8rem;
+  box-shadow: 10px 10px 5px #a0a0a0e0;
+  background-image: linear-gradient(
+    to bottom right,
+    rgba(255, 255, 255, 0.849),
+    rgba(60, 183, 255, 0.712)
+  );
 }
 .card {
   background-color: rgba(0, 0, 0, 0);

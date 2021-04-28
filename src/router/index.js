@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import login from '@/components/login'
+import forget from '@/components/forget'
 import adminHome from '../components/home.vue'
 import createStroe from '../components/store/创建商家.vue'
 import upload from '../components/store/upload.vue'
@@ -19,6 +20,7 @@ import mineCollect from '@/components/custmer/我的收藏'
 import orderSubmit from '@/components/custmer/订单提交页'
 import orderDetail from '@/components/custmer/订单详情页'
 import orderDetailStore from '@/components/store/订单详情页'
+import advertisement from '@/components/store/广告中心'
 import orderPay from '@/components/custmer/订单支付页'
 
 Vue.use(Router)
@@ -33,6 +35,11 @@ export default new Router({
       path: '/login',
       name: 'login',
       component: login
+    },
+    {
+      path: '/forget',
+      name: 'forget',
+      component: forget
     },
     {
       path: '/register',
@@ -131,6 +138,11 @@ export default new Router({
       path: '/store/订单管理',
       name: '订单管理',
       component: storeOrder,
+    },
+    {
+      path: '/store/广告中心',
+      name: '广告中心',
+      component: advertisement,
     },
     
   ]

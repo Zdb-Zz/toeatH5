@@ -1,16 +1,32 @@
 <template>
-  <div>
+  <div class="background">
     <van-image round width="2.5rem" height="2.5rem" fit="cover" :src="store.storeImg" />
     <h2>{{store.storeName}}</h2>
-    <van-cell-group>
-      <van-cell value="商家信息" is-link to="/store/商家信息" icon="manager" />
-      <van-cell value="订单管理" is-link to="/store/订单管理" icon="balance-list" />
-    </van-cell-group>
+
     <van-tabbar v-model="active">
       <van-tabbar-item icon="home-o" @click="menu">菜单</van-tabbar-item>
       <van-tabbar-item icon="chart-trending-o" @click="chart">统计</van-tabbar-item>
       <van-tabbar-item icon="friends-o" @click="center">商家中心</van-tabbar-item>
     </van-tabbar>
+    <div class="grid">
+      <van-grid column-num="3" :border="true" :gutter="10">
+        <van-grid-item text="商家信息" to="/store/商家信息">
+          <template #icon>
+            <van-icon name="manager" size="1rem" color="rgba(125, 190, 250, 0.89)" />
+          </template>
+        </van-grid-item>
+        <van-grid-item text="订单管理" to="/store/订单管理">
+          <template #icon>
+            <van-icon name="balance-list" size="1rem" color="rgba(125, 190, 250, 0.89)" />
+          </template>
+        </van-grid-item>
+        <van-grid-item text="广告管理" to="/store/广告中心">
+          <template #icon>
+            <van-icon name="label" size="1rem" color="rgba(125, 190, 250, 0.89)" />
+          </template>
+        </van-grid-item>
+      </van-grid>
+    </div>
     <van-button type="info" block :style="{position:'fixed',bottom:'2rem'}" @click="outLogin()">退出登录</van-button>
   </div>
 </template>
@@ -34,7 +50,10 @@ export default {
     this.initWebSocket();
     getStoreByUser().then((res) => {
       this.store = res.data;
-      Notify({ type: "primary", message: "您有"+this.store.storeNotify+"条新的订单，请尽快处理" });
+      Notify({
+        type: "primary",
+        message: "您有" + this.store.storeNotify + "条新的订单，请尽快处理",
+      });
     });
   },
   destroyed: function () {
@@ -43,8 +62,11 @@ export default {
   },
   mounted() {
     // 主要通知
-    console.log(this.store)
-    Notify({ type: "primary", message: "您有"+this.store.storeNotify+"条新的订单，请尽快处理" });
+    console.log(this.store);
+    Notify({
+      type: "primary",
+      message: "您有" + this.store.storeNotify + "条新的订单，请尽快处理",
+    });
   },
   methods: {
     menu() {
@@ -93,7 +115,10 @@ export default {
     },
     websocketonmessage: function (e) {
       console.log(e.data);
-      Notify({ type: "primary", message: "您有"+e.data+"条新的订单，请尽快处理" });
+      Notify({
+        type: "primary",
+        message: "您有" + e.data + "条新的订单，请尽快处理",
+      });
       this.message = e;
     },
     websocketclose: function (e) {
@@ -125,5 +150,26 @@ a {
 }
 .formTop {
   margin-bottom: 1rem;
+}
+.van-tabbar-item {
+  color: rgba(51, 143, 230, 0.89);
+  background-color: rgba(255, 255, 255, 0.89);
+}
+.van-tabbar-item--active {
+  color: #ffffff;
+  background-color: rgba(51, 143, 230, 0.89);
+}
+.background {
+  height: 100vh;
+  width: 100vw;
+  background-image: url("../../assets/images/商家列表.jpg");
+  z-index: 99;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+.grid {
+  text-align: center;
+  margin: 0 auto;
+  font-weight: 800;
 }
 </style>

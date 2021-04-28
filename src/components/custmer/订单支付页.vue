@@ -30,7 +30,29 @@
       </van-list>
     </van-cell-group>
 
-    <van-submit-bar :price="order.orderSumPrice*100" button-text="立即支付" @submit="onSubmit" />
+    <van-submit-bar :price="order.orderSumPrice*100" button-text="立即支付" @submit="show=true" />
+
+    <!-- 图标位置 -->
+    <van-popup
+      v-model="show"
+      closeable
+      close-icon-position="top-left"
+      position="bottom"
+      :style="{ height: '55%' }"
+    >
+      <h2>请输入支付密码</h2>
+      <!-- 密码输入框 -->
+      <van-password-input
+        :value="value"
+        :focused="showKeyboard"
+        info="密码为 6 位数字"
+        :error-info="errorInfo"
+        @focus="showKeyboard = true"
+        :length="6"
+      />
+      <!-- 数字键盘 -->
+      <van-number-keyboard v-model="value" :show="showKeyboard" @blur="show=false" />
+    </van-popup>
   </div>
 </template>
 
@@ -38,7 +60,7 @@
 import router from "../../router";
 import { Toast } from "vant";
 
-import { getOrderById, payOrder } from "../../api/index";
+import { getOrderById, payOrder, findUser } from "../../api/index";
 export default {
   data() {
     return {
@@ -47,12 +69,16 @@ export default {
         storeId: "",
       },
       order: {},
+      show: false,
       menuList: [],
       newOrder: {
         orderId: "",
         orderEvaluate: "",
         rate: 5,
       },
+      value: "",
+      showKeyboard: true,
+      errorInfo: "",
     };
   },
   created() {
@@ -63,6 +89,44 @@ export default {
       this.order = res.data;
       this.menuList = res.data.orderMenus;
     });
+    findUser().then((res) => {
+      this.user = res.data;
+      if (this.user.userPayPassword == null) {
+        this.$dialog
+          .confirm({
+            message: "您的支付密码未设置，请前往个人信息设置",
+          })
+          .then(() => {
+            this.$router.push({
+              path: "/custmer/个人信息",
+            });
+          });
+      }
+    });
+  },
+  watch: {
+    value(value) {
+      if (value.length === 6) {
+        if (value == this.user.userPayPassword) {
+          this.show = false;
+          Toast.success("支付成功");
+          payOrder(this.query.orderId).then((res) => {
+            if (res.code == 1) {
+              this.$router.push({
+                path: "/custmer/订单详情页",
+                query: {
+                  orderId: this.query.orderId,
+                },
+              });
+            }
+          });
+        }else {
+        this.errorInfo = "密码错误！请重新输入";
+      }
+      } else {
+        this.errorInfo = "";
+      }
+    },
   },
   methods: {
     onClickLeftToOrders() {

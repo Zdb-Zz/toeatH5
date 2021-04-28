@@ -1,40 +1,41 @@
 <template>
-  <van-form @submit="createStore" class="createStore">
-    <van-nav-bar
-      title="创建商家"
-      @click-left="onClickLeft"
-      @click-right="onClickRight"
-      class="formTop"
-    />
-    <van-field
-      v-model="query.storeName"
-      name="商家名称"
-      label="商家名称"
-      placeholder="商家名称"
-      :rules="[{ required: true, message: '请填写商家名称' }]"
-    />
-    <van-field
-      v-model="query.storeRemark"
-      name="商家信息"
-      label="商家信息"
-      placeholder="商家信息"
-      :rules="[{ required: true, message: '商家信息' }]"
-    />
-    <!-- <van-field name="radio" label="营业状态">
+  <div class="background">
+    <van-form @submit="createStore" class="createStore">
+      <van-nav-bar
+        title="创建商家"
+        @click-left="onClickLeft"
+        @click-right="onClickRight"
+        class="formTop"
+      />
+      <van-field
+        v-model="query.storeName"
+        name="商家名称"
+        label="商家名称"
+        placeholder="商家名称"
+        :rules="[{ required: true, message: '请填写商家名称' }]"
+      />
+      <van-field
+        v-model="query.storeRemark"
+        name="商家信息"
+        label="商家信息"
+        placeholder="商家信息"
+        :rules="[{ required: true, message: '商家信息' }]"
+      />
+      <!-- <van-field name="radio" label="营业状态">
       <template #input>
         <van-radio-group v-model="query.storeState" direction="horizontal">
           <van-radio name="1">正在营业</van-radio>
           <van-radio name="0">未营业</van-radio>
         </van-radio-group>
       </template>
-    </van-field> -->
-    <van-field
-      v-model="query.storeAddress"
-      name="商家地址"
-      label="商家地址"
-      placeholder="商家地址"
-      :rules="[{ required: true, message: '商家地址' }]"
-    />
+      </van-field>-->
+      <van-field
+        v-model="query.storeAddress"
+        name="商家地址"
+        label="商家地址"
+        placeholder="商家地址"
+        :rules="[{ required: true, message: '商家地址' }]"
+      />
       <div class="box">
         <div class="foodImg">
           <van-image :src="`${imgSrc}` " width="2rem" height="2rem">
@@ -56,17 +57,18 @@
           />
         </div>
       </div>
-    <div style="margin: 16px;">
-      <van-button round block type="info" native-type="submit">提交</van-button>
-    </div>
-  </van-form>
+      <div style="margin: 16px;">
+        <van-button round block type="info" native-type="submit">提交</van-button>
+      </div>
+    </van-form>
+  </div>
 </template>
 
 <script>
 import { createStore } from "../../api/index";
 import { Toast } from "vant";
 import router from "../../router";
-import Cookies from 'js-cookie'
+import Cookies from "js-cookie";
 
 export default {
   props: {
@@ -89,9 +91,9 @@ export default {
         storeName: "",
         storeRemark: "",
         storeState: "1",
-        storeId:null,
+        storeId: null,
         storeImg: "",
-        storeAddress:''
+        storeAddress: "",
       },
       imgSrc: "",
     };
@@ -100,7 +102,7 @@ export default {
     createStore() {
       this.query.storeImg = this.imgSrc;
       createStore(this.query).then((res) => {
-        Cookies.set("storeId",res.data)
+        Cookies.set("storeId", res.data);
         this.$router.push({
           path: "/store/菜单",
           query: {
@@ -148,6 +150,7 @@ export default {
         var result = "";
         //执行上传操作
         var xhr = new XMLHttpRequest();
+        //调用上传图片接口
         xhr.open("post", "/back/file/uploadFile", true);
         xhr.onreadystatechange = function () {
           if (xhr.readyState == 4) {
@@ -155,6 +158,7 @@ export default {
               let returnData = $.parseJSON(xhr.responseText);
               const imgSrcArr = returnData.url.split("local");
               console.log(imgSrcArr);
+              //拼接图片路径，访问服务器上图片并显示
               self.imgSrc = "http://121.4.60.27:8080" + imgSrcArr[1];
               console.log(self.imgSrc);
               if (returnData.code == 1) {
@@ -278,5 +282,13 @@ a {
 }
 .upDiv .upinp[data-v-47984b77] {
   width: 100%;
+}
+.background {
+  height: 100vh;
+  width: 100vw;
+  background-image: url("../../assets/images/商家列表.jpg");
+  z-index: 99;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 </style>

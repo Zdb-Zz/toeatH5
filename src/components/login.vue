@@ -1,33 +1,33 @@
 <template>
-  <div>
-    <van-form @submit="login" class="loginForm">
-      <van-nav-bar
-        title="用户登录"
-        right-text="新用户注册"
-        @click-left="onClickLeft"
-        @click-right="onClickRight"
-        class="formTop"
-      />
-      <van-field
-        v-model="query.userName"
-        name="用户名"
-        label="用户名"
-        placeholder="用户名"
-        :rules="[{ required: true, message: '请填写用户名' }]"
-      />
-      <van-field
-        v-model="query.userPassWord"
-        type="password"
-        name="密码"
-        label="密码"
-        placeholder="密码"
-        :rules="[{ required: true, message: '请填写密码' }]"
-      />
-      <div style="margin: 16px;">
-        <van-button round block type="info" native-type="submit">提交</van-button>
-      </div>
-    </van-form>客户端：zdb1 123
-    <br />商家端：zdb2 123
+  <div class="background">
+    <div>
+      <van-form @submit="login" class="loginForm">
+        <div class="login_box">
+          <van-field
+            class="field"
+            v-model="query.userName"
+            name="用户名"
+            label="用户名"
+            placeholder="用户名"
+            :border="true"
+            :rules="[{ required: true, message: '请填写用户名' }]"
+          />
+          <van-field
+            v-model="query.userPassWord"
+            type="password"
+            name="密码"
+            label="密码"
+            placeholder="密码"
+            :rules="[{ required: true, message: '请填写密码' }]"
+          />
+          <div style="margin: 16px;">
+            <van-button round block type="info" native-type="submit">登录</van-button>
+          </div>
+        </div>
+      </van-form>
+    </div>
+    <van-nav-bar right-text="没有账号？注册新用户" @click-right="onClickRight" />
+    <van-nav-bar right-text="忘记密码？" @click-right="forgetPassword" />
   </div>
 </template>
 
@@ -81,6 +81,10 @@ export default {
       console.log("onClickRight");
       router.push("/register");
     },
+    forgetPassword() {
+      console.log("forgetPassword");
+      router.push("/forget");
+    },
     getAuthCode() {
       my.getAuthCode({
         scopes: "auth_user", // 主动授权：auth_user，静默授权：auth_base
@@ -112,6 +116,9 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 h1,
+body {
+  background-color: aqua;
+}
 h2 {
   font-weight: normal;
 }
@@ -126,10 +133,32 @@ li {
 a {
   color: #42b983;
 }
-.loginForm {
-  margin-top: 1rem;
+
+.background {
+  height: 100vh;
+  width: 100vw;
+  background-image: url("../assets/images/登录1.png");
+  background-repeat: no-repeat;
+  padding-top: 4rem;
+  position: absolute;
 }
 .formTop {
+  margin-top: 1rem;
   margin-bottom: 1rem;
+}
+.van-cell {
+  background-color: rgba(0, 0, 0, 0);
+}
+
+.login_box {
+  width: 80%;
+  margin: 0 auto;
+}
+.field {
+  border: lightcoral;
+}
+.van-nav-bar__text {
+  color: #1989fa;
+  margin-right: 1.54rem;
 }
 </style>

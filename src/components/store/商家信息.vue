@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="background">
     <van-nav-bar
       title="我的商家信息"
       left-text="返回"
@@ -246,5 +246,17 @@ a {
 }
 .upDiv .upinp[data-v-47984b77] {
   width: 100%;
+}
+
+.background {
+  height: 100vh;
+  width: 100vw;
+  background-image: url("../../assets/images/收藏.jpg");
+  z-index: 99;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+.van-cell {
+  background-color: rgba(0, 0, 0, 0);
 }
 </style>

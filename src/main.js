@@ -8,11 +8,17 @@ import Vant from 'vant';
 import 'vant/lib/index.css';
 import 'jquery'
 import echarts from 'echarts'
+import { Lazyload,Dialog } from 'vant';
+
+
+// 全局注册
+
 
 Vue.use(Vant);
 Vue.config.productionTip = false
 Vue.prototype.$echarts = echarts
-
+Vue.use(Lazyload);
+Vue.use(Dialog);
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

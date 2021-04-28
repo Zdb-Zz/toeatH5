@@ -1,6 +1,7 @@
 <template>
-  <div>
+  <div class="background">
     <van-nav-bar title="我的收藏" left-text="返回" @click-left="onClickLeft" class="formTop" />
+    <van-empty description="暂无菜品" v-if="list==null" />
     <van-list>
       <van-cell v-for="item in list" :key="item.menuId">
         <van-card
@@ -134,5 +135,13 @@ a {
 .van-icon {
   position: relative;
   float: right;
+}
+.background {
+  height: 100vh;
+  width: 100vw;
+  background-image: url("../../assets/images/收藏.jpg");
+  z-index: 99;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 </style>

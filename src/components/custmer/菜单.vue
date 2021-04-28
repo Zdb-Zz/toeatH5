@@ -18,6 +18,19 @@
         <div @click="onSearch">搜索</div>
       </template>
     </van-search>
+
+    <van-swipe class="my-swipe" :autoplay="3000" indicator-color="white" v-if="swipeShow">
+      <van-swipe-item>
+        <van-image :src="require('../../assets/images/轮播2.jpg')" />
+      </van-swipe-item>
+      <van-swipe-item>
+        <van-image :src="require('../../assets/images/轮播3.jpg')" />
+      </van-swipe-item>
+      <van-swipe-item>
+        <van-image :src="require('../../assets/images/轮播4.jpg')" />
+      </van-swipe-item>
+    </van-swipe>
+
     <van-tree-select
       height="100%"
       :items="items"
@@ -125,6 +138,7 @@
         />
         <van-list v-model="loading" :finished="finished" @load="onLoad">
           <van-cell
+            class="shopcar"
             v-for="item in shopCarList"
             center
             :key="item.menuId"
@@ -132,6 +146,10 @@
             :label="'￥'+item.priceAfterDiscount"
             v-if="item.menuNum != null && shopCarList!=null"
           >
+            <template #icon>
+              <van-image class="img" width="2rem" height="2rem" :src="item.menuImg" />
+            </template>
+
             <van-stepper
               v-model="item.menuNum"
               min="0"
@@ -191,6 +209,42 @@
         <van-loading v-if="show" size="2rem" />
       </div>
     </van-overlay>
+
+    <van-overlay
+      class="advertisementShow"
+      :show="advertisementShow"
+      @click="advertisementShow = false"
+    >
+      <div class="block">
+        <van-swipe :autoplay="1500">
+          <van-swipe-item v-for="(image, index) in imgList" :key="index">
+            <van-image width="80%" height="80%" :src="image" />
+          </van-swipe-item>
+        </van-swipe>
+      </div>
+    </van-overlay>
+
+    <!-- 图标位置 -->
+    <van-popup
+      v-model="payShow"
+      closeable
+      close-icon-position="top-left"
+      position="bottom"
+      :style="{ height: '55%' }"
+    >
+      <h2>请输入支付密码</h2>
+      <!-- 密码输入框 -->
+      <van-password-input
+        :value="value"
+        :focused="showKeyboard"
+        info="密码为 6 位数字"
+        :error-info="errorInfo"
+        @focus="showKeyboard = true"
+        :length="6"
+      />
+      <!-- 数字键盘 -->
+      <van-number-keyboard v-model="value" :show="showKeyboard" @blur="show=false" />
+    </van-popup>
   </div>
 </template>
 
@@ -207,6 +261,7 @@ import {
   unCollectMenu,
   getRecommendList,
   cleanShopCar,
+  getAdvertisement,
 } from "../../api/index";
 import router from "../../router";
 import { Dialog } from "vant";
@@ -222,6 +277,7 @@ export default {
         menuName: "",
       },
       active: 0,
+      swipeShow : true,
       list: [],
       loading: false,
       finished: true,
@@ -235,6 +291,17 @@ export default {
       recommendList: [],
       container: null,
       show: true,
+      payShow:false,
+      advertisementShow: true,
+      imgList: [],
+      fileList: [],
+      imgList2: [],
+      fileList2: [],
+      request: {
+        imgList2: [],
+        storeId: "",
+        type: "",
+      },
     };
   },
   created() {
@@ -260,12 +327,47 @@ export default {
     setTimeout(() => {
       this.show = false;
     }, 100);
+
+    this.request.storeId = this.query.storeId;
+    this.request.type = 0;
+    getAdvertisement(this.request).then((res) => {
+      if(res.data.length==0){
+        this.advertisementShow=false
+      }
+      console.log(res.data);
+      res.data.forEach((element) => {
+        this.imgList.push(element.advertisementImg);
+        this.fileList.push({
+          url: element.advertisementImg,
+          id: element.advertisementId,
+        });
+      });
+      this.request.type = 1;
+      getAdvertisement(this.request).then((res) => {
+        if(res.data.length==0){
+        this.swipeShow=false
+      }
+        console.log(res.data);
+        res.data.forEach((element) => {
+          this.imgList2.push(element.advertisementImg);
+          this.fileList2.push({
+            url: element.advertisementImg,
+            id: element.advertisementId,
+          });
+        });
+      });
+    });
+    console.log(this.imgList);
+    console.log(this.imgList2);
   },
   mounted() {
     this.container = this.$refs.container;
     setTimeout(() => {
       this.show = false;
     }, 100);
+    setTimeout(() => {
+      this.advertisementShow = false;
+    }, 5000);
   },
 
   methods: {
@@ -394,7 +496,7 @@ export default {
       router.push("/custmer/商家列表");
     },
     onClickRight() {
-      console.log(this.query.storeId)
+      console.log(this.query.storeId);
       getRecommendList(this.query.storeId).then((res) => {
         this.recommendList = res.data;
         console.log(res);
@@ -471,6 +573,12 @@ a {
   -webkit-box-flex: 3;
   -webkit-flex: 3;
   flex: 3;
+
+  width: 100vh;
+  height: 100vh;
+  background-image: url("../../assets/images/菜单.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 .setNum {
   background-color: tomato;
@@ -517,6 +625,9 @@ a {
   margin-bottom: 1.333333rem;
   padding-left: 2rem;
 }
+.shopcar {
+  left: -1rem;
+}
 .van-tree-select__nav {
   top: 4.2rem;
   position: fixed;
@@ -525,5 +636,45 @@ a {
 
 .van-submit-bar__bar {
   z-index: 200;
+}
+.van-card {
+  position: relative;
+  box-sizing: border-box;
+  padding: 0.213333rem 0.426667rem;
+  color: #323233;
+  font-size: 0.5rem;
+  border-radius: 0.8rem;
+  background: linear-gradient(
+    to bottom right,
+    rgba(255, 255, 255, 0.849),
+    rgba(60, 183, 255, 0.712)
+  );
+}
+.img {
+  float: left;
+}
+.advertisementShow {
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+.my-swipe {
+  width: 80%;
+  height: 80%;
+  margin-left: 2rem;
+}
+.my-swipe .van-swipe-item {
+  color: #fff;
+  font-size: 20px;
+  text-align: center;
+  width: 80%;
+  height: 80%;
+}
+.block {
+  width: 100vw;
+  height: 100vh;
+  margin-top: 5rem;
 }
 </style>

@@ -54,8 +54,8 @@
                 <van-tag plain type="danger" v-if="item.menuFlavor==4" v-show="true">特辣</van-tag>
               </template>
               <template #footer>
-                <van-button @click="getMenuById(item.menuId)" size="mini">修改</van-button>
-                <van-button @click="delMenuById(item.menuId)" size="mini">删除</van-button>
+                <van-button color="linear-gradient(to right, #ff6034, #ee0a24)" @click="getMenuById(item.menuId)" size="mini">修改</van-button>
+                <van-button color="linear-gradient(to right, #ff6034, #ee0a24)" @click="delMenuById(item.menuId)" size="mini">删除</van-button>
               </template>
             </van-card>
           </van-cell>
@@ -78,13 +78,13 @@
               left-text="取消"
               right-text="提交"
               @click-left="show = false"
-              @click-right="addMenu"
-            />
+            ></van-nav-bar>
             <van-field
               v-model="food.menuName"
               name="菜品名称"
               label="菜品名称"
               placeholder="菜品名称"
+              :required="true"
               :rules="[{ required: true, message: '请填写菜品名称' }]"
             />
             <van-field
@@ -92,6 +92,7 @@
               name="菜品原价格"
               label="菜品原价格"
               placeholder="菜品原价格"
+              :required="true"
               :rules="[{ required: true, message: '菜品原价格' }]"
               @change="editDiscount($event)"
             />
@@ -100,6 +101,7 @@
               name="菜品折扣（%）"
               label="菜品折扣（%）"
               placeholder="菜品折扣（%）"
+              :required="true"
               :rules="[{ required: true, message: '菜品折扣（%）' }]"
               @change="editDiscount($event)"
             />
@@ -131,9 +133,12 @@
               readonly
               clickable
               name="picker"
+              :default-index="0"
               :value="food.menuTypeDes"
               label="菜品类型"
               placeholder="点击选择菜品类型"
+              :required="true"
+              :rules="[{ required: true }]"
               @click="showPicker = true"
             />
             <van-popup v-model="showPicker" position="bottom">
@@ -166,13 +171,10 @@
                 />
               </div>
             </div>
-            <van-field
-              v-model="food.menuText"
-              name="菜品描述"
-              label="菜品描述"
-              placeholder="菜品描述"
-              :rules="[{ required: true, message: '请填写菜品描述' }]"
-            />
+            <van-field v-model="food.menuText" name="菜品描述" label="菜品描述" placeholder="菜品描述" />
+            <div style="margin: 16px;">
+              <van-button round block type="info" native-type="submit">提交</van-button>
+            </div>
           </van-form>
         </div>
       </div>
@@ -194,6 +196,7 @@
               v-model="food.menuName"
               name="菜品名称"
               label="菜品名称"
+              :required="true"
               placeholder="菜品名称"
               :rules="[{ required: true, message: '请填写菜品名称' }]"
             />
@@ -201,6 +204,7 @@
               v-model="food.menuPrice"
               name="菜品原价格"
               label="菜品原价格"
+              :required="true"
               placeholder="菜品原价格"
               :rules="[{ required: true, message: '请填写菜品原价格' }]"
               @change="editDiscount($event)"
@@ -209,6 +213,7 @@
               v-model="food.menuDiscount"
               name="菜品折扣（%）"
               label="菜品折扣（%）"
+              :required="true"
               placeholder="菜品折扣（%）"
               :rules="[{ required: true, message: '请填写菜品折扣（%）' }]"
               @change="editDiscount($event)"
@@ -244,6 +249,7 @@
               :value="food.menuTypeDes"
               label="菜品类型"
               placeholder="点击选择菜品类型"
+              :required="true"
               @click="showPicker = true"
             />
             <van-popup v-model="showPicker" position="bottom">
@@ -746,7 +752,12 @@ a {
   padding: 0.213333rem 0.426667rem;
   color: #323233;
   font-size: 0.5rem;
-  background-color: #fafafa;
+  border-radius: 0.8rem;
+  background: linear-gradient(
+    to bottom right,
+    rgba(255, 255, 255, 0.849),
+    rgba(60, 183, 255, 0.712)
+  );
 }
 .van-card__title {
   max-height: 1.853333rem;
@@ -865,8 +876,21 @@ a {
   -webkit-box-flex: 3;
   -webkit-flex: 3;
   flex: 3;
+  height: 100vh;
+  width: 100vw;
+  background-image: url("../../assets/images/菜单.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 .upDiv .upinp[data-v-47984b77] {
   width: 100%;
+}
+.van-tabbar-item {
+  color: rgba(51, 143, 230, 0.89);
+  background-color: rgba(255, 255, 255, 0.89);
+}
+.van-tabbar-item--active {
+  color: #ffffff;
+  background-color: rgba(51, 143, 230, 0.89);
 }
 </style>

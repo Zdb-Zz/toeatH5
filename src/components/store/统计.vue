@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="background">
     <h1>营业报告</h1>
     <van-grid class="orderToday" :border="false" :column-num="2">
       <van-grid-item>
@@ -211,4 +211,21 @@ a {
 .formTop {
   margin-bottom: 1rem;
 }
+
+.background {
+  height: 100vh;
+  width: 100vw;
+  background-image: url("../../assets/images/商家列表.jpg");
+  z-index: 99;
+  background-repeat: no-repeat;
+}
+.van-tabbar-item {
+  color: rgba(51, 143, 230, 0.89);
+  background-color: rgba(255, 255, 255, 0.89);
+}
+.van-tabbar-item--active {
+  color: #ffffff;
+  background-color: rgba(51, 143, 230, 0.89);
+}
+
 </style>

@@ -54,11 +54,18 @@
         />
         <van-field name="rate" label="评分">
           <template #input>
-            <van-rate v-model="order.orderRate" :size="25" color="#ffd21e" void-icon="star" void-color="#eee" />
+            <van-rate
+              v-model="order.orderRate"
+              :size="25"
+              color="#ffd21e"
+              void-icon="star"
+              void-color="#eee"
+            />
           </template>
         </van-field>
         <div style="margin: 16px;">
-          <van-button round block type="info" native-type="submit">提交</van-button>
+          <van-button v-if="order.orderState==1" round block type="info" native-type="submit">评论</van-button>
+          <van-button v-if="order.orderState==0" round block type="info" native-type="submit">支付</van-button>
         </div>
       </van-form>
     </div>
@@ -69,7 +76,7 @@
 import router from "../../router";
 import { Toast } from "vant";
 
-import { getOrderById ,evaluateOrder} from "../../api/index";
+import { getOrderById, evaluateOrder } from "../../api/index";
 export default {
   data() {
     return {
@@ -80,9 +87,9 @@ export default {
       order: {},
       menuList: [],
       newOrder: {
-        orderId:'',
-        orderEvaluate:'',
-        rate:5
+        orderId: "",
+        orderEvaluate: "",
+        rate: 5,
       },
     };
   },
@@ -114,19 +121,23 @@ export default {
       this.newOrder.orderId = this.query.orderId;
       this.newOrder.orderEvaluate = this.order.orderEvaluate;
       this.newOrder.rate = this.order.orderRate;
-      evaluateOrder(this.newOrder).then((res) => {if (res.code == 1) {
-          Toast.success("评论成功");
-          this.$router.push({
-        path: "/custmer/我的订单",
-        
-      });
-        } else if (res.code == 3) {
-          Toast.fail("评论失败");
-          this.$router.push({
-        path: "/custmer/我的订单",
-        
-      });
-        }});
+      if (this.order.orderState == 1) {
+        evaluateOrder(this.newOrder).then((res) => {});
+        this.$router.push({
+          path: "/custmer/我的订单",
+          query: {
+            orderId: this.query.orderId,
+          },
+        });
+      } else if (this.order.orderState == 0) {
+        evaluateOrder(this.newOrder).then((res) => {});
+        this.$router.push({
+          path: "/custmer/订单支付页",
+          query: {
+            orderId: this.query.orderId,
+          },
+        });
+      }
     },
   },
 };

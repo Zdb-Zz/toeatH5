@@ -33,8 +33,8 @@ module.exports = {
     assetsPublicPath: "/",
     proxyTable: {
       "/back": {
-      target: "http://localhost:3000",   
-      // target: "http://121.4.60.27:3000",   
+      // target: "http://localhost:3000",   
+      target: "http://121.4.60.27:3000",   
       changeOrigin: true,  
       pathRewrite: {
         "^/back": "/"

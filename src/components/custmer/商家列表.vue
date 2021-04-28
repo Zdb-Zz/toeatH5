@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="background">
     <van-nav-bar title="商家列表" class="formTop" />
     <van-search
       v-model="query.storeName"
@@ -19,7 +19,17 @@
         :style="{position:'fixed',float:'left',zIndex:'1000',top:'50%',left:'50%',transform:' translate(-50%,-50%)'}"
       />
     </van-overlay>
-
+    <van-swipe class="my-swipe" :autoplay="3000" indicator-color="white">
+      <van-swipe-item>
+        <van-image :src="require('../../assets/images/轮播2.jpg')" />
+      </van-swipe-item>
+      <van-swipe-item>
+        <van-image :src="require('../../assets/images/轮播3.jpg')" />
+      </van-swipe-item>
+      <van-swipe-item>
+        <van-image :src="require('../../assets/images/轮播4.jpg')" />
+      </van-swipe-item>
+    </van-swipe>
     <van-pull-refresh v-model="refreshing" @refresh="onRefresh">
       <van-list :finished="finished" finished-text="没有更多了" @load="onLoad">
         <van-cell v-for="item in stores" :key="item.storeId">
@@ -50,7 +60,7 @@
 
 <script>
 import { Toast } from "vant";
-import { getStoreList } from "../../api/index";
+import { getStoreList, findUser } from "../../api/index";
 import router from "../../router";
 export default {
   data() {
@@ -58,12 +68,17 @@ export default {
       query: {
         storeName: "",
       },
+      user: {},
       active: 0,
       loading: false,
       finished: false,
       refreshing: false,
       stores: [],
       show: true,
+      images: [
+        require("../../assets/images/轮播1.jpg"),
+        require("../../assets/images/轮播2.jpg"),
+      ],
     };
   },
   created() {
@@ -75,6 +90,20 @@ export default {
       }
       this.stores = res.data;
       console.log(res);
+    });
+    findUser().then((res) => {
+      this.user = res.data;
+      if (this.user.userPayPassword == null) {
+        this.$dialog
+          .confirm({
+            message: "您的支付密码未设置，请前往个人信息设置",
+          })
+          .then(() => {
+            this.$router.push({
+              path: "/custmer/个人信息",
+            });
+          });
+      }
     });
   },
   methods: {
@@ -150,5 +179,30 @@ a {
   font-size: 0.43rem;
   font-weight: 1000;
   line-height: 0.43rem;
+}
+.my-swipe .van-swipe-item {
+  color: #fff;
+  font-size: 20px;
+  text-align: center;
+  height: 3rem;
+}
+.van-tabbar-item {
+  color: rgba(51, 143, 230, 0.89);
+  background-color: rgba(255, 255, 255, 0.89);
+}
+.van-tabbar-item--active {
+  color: #ffffff;
+  background-color: rgba(51, 143, 230, 0.89);
+}
+.van-nav-bar {
+  position: relative;
+  background-image: linear-gradient(
+    to bottom right,
+    rgb(255, 255, 255),
+    rgb(48, 130, 207)
+  );
+}
+.van-list {
+  margin-bottom: 2rem;
 }
 </style>

@@ -48,7 +48,16 @@ export const register = query => {
         data:query
     });
 };
-
+/**
+ * 修改密码
+ */
+export const forget = query => {
+    return request({
+        url: '/back/user/forget',
+        method: 'post',
+        data:query
+    });
+};
 /**
  * 根据用户id获取商家信息
  */
@@ -424,5 +433,26 @@ export const totalBusiness = query => {
         url: '/back/order/completeMenu',
         method: "get",
         params:{orderMenuId}
+    });
+};
+
+/**
+ * 添加广告
+ */
+export const editAdvertisement = query => {
+    return request({
+        url: '/back/store/editAdvertisement',
+        method: "post",
+        data:query
+    });
+};
+/**
+ * 添加广告
+ */
+ export const getAdvertisement = query => {
+    return request({
+        url: '/back/store/getAdvertisement',
+        method: "get",
+        params:query
     });
 };

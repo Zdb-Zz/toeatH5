@@ -96,34 +96,29 @@ export default {
     this.query.storeId = Cookies.get("storeId");
     this.query.state = this.value1;
     this.query.timeOrder = this.value2;
-    getStoreOrders(this.query).then((res) => {
-      console.log(res);
-      this.list = res.data;
-      this.list.forEach((element) => {
-        element.menuString = "";
-        element.orderMenus.forEach((item) => {
-          element.menuString =
-            element.menuString + item.menuName + "×" + item.menuNum + " ";
-        });
-      });
-    });
     console.log(this.list);
   },
   methods: {
     onLoad() {
+      //请求接口
       getStoreOrders(this.query).then((res) => {
         console.log(res);
         res.data.forEach((element) => {
+          //将菜品名称进行拼接
           element.menuString = "";
           element.orderMenus.forEach((item) => {
             element.menuString =
               element.menuString + item.menuName + "×" + item.menuNum + " ";
           });
+          //将订单存入列表
           this.list.push(element);
         });
+        //暂停加载
         this.loading = false;
+        //请求下一页数据
         this.query.pageIndex = this.query.pageIndex + 1;
         if (res.data.length < this.query.pageSize) {
+          //返回条数比每页条数短，加载完成
           this.finished = true;
           this.loading = false;
         }
@@ -187,6 +182,7 @@ a {
 }
 .loginForm {
   margin-top: 1rem;
+ 
 }
 .price-bottom-class {
   font-size: 0.3rem;

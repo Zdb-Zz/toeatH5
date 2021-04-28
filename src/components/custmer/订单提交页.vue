@@ -41,7 +41,12 @@
 
 <script>
 import router from "../../router";
-import { getShopCarList, getTotalPrice,submitOrder,sendAllWebSocket} from "../../api/index";
+import {
+  getShopCarList,
+  getTotalPrice,
+  submitOrder,
+  sendAllWebSocket,
+} from "../../api/index";
 export default {
   data() {
     return {
@@ -49,9 +54,9 @@ export default {
         menus: [],
         storeId: "",
         remark: "",
-        totalPrice:0
+        totalPrice: 0,
       },
-      list:[],
+      list: [],
       price: 0,
     };
   },
@@ -61,7 +66,7 @@ export default {
       this.list = res.data;
     });
     getTotalPrice().then((res) => {
-      this.query.totalPrice = res.data
+      this.query.totalPrice = res.data;
       this.price = res.data * 100;
     });
   },
@@ -75,19 +80,18 @@ export default {
       });
     },
     onSubmit() {
-      this.query.menus = JSON.stringify(this.list)
-      submitOrder(this.query).then((res)=>{
-        console.log(res)
+      this.query.menus = JSON.stringify(this.list);
+      submitOrder(this.query).then((res) => {
+        console.log(res);
         this.$router.push({
-        path: "/custmer/订单详情页",
-        query: {
-          orderId: res.data,
-          storeId: this.query.storeId,
-        },
+          path: "/custmer/订单详情页",
+          query: {
+            orderId: res.data,
+            storeId: this.query.storeId,
+          },
+        });
       });
-      })
-      sendAllWebSocket(this.query.storeId).then((res)=>{
-      })
+      sendAllWebSocket(this.query.storeId).then((res) => {});
     },
   },
 };
@@ -115,8 +119,10 @@ a {
 }
 .formTop {
   margin-bottom: 1rem;
+  background-image: linear-gradient(to bottom right, rgb(255, 255, 255), rgb(77, 213, 255));
 }
 .remarkClass {
   background-color: #e4e4e460;
+  margin-bottom: 2rem;
 }
 </style>
