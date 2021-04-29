@@ -38,7 +38,7 @@
       closeable
       close-icon-position="top-left"
       position="bottom"
-      :style="{ height: '55%' }"
+      :style="{ height: '65%' }"
     >
       <h2>请输入支付密码</h2>
       <!-- 密码输入框 -->

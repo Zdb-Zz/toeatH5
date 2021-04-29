@@ -76,7 +76,6 @@
               title="新增菜品"
               class="formTop"
               left-text="取消"
-              right-text="提交"
               @click-left="show = false"
             ></van-nav-bar>
             <van-field
@@ -303,7 +302,7 @@
               left-text="取消"
               right-text="提交"
               @click-left="editTypeShow = false"
-              @click-right="editType,editTypeShow = false"
+              @click-right="editType(),editTypeShow = false"
             />
             <van-list :style="{width: '49%', display:'inline-block'}">
               <van-cell title="类名" />
@@ -677,6 +676,7 @@ export default {
       });
     },
     editType() {
+      console.log("editType")
       var index = 0;
       console.log(this.menuTypeList);
       this.menuTypeList.forEach((element) => {
@@ -689,6 +689,7 @@ export default {
         var object = {};
         object.array = this.menuTypeList;
         object.storeId = this.query.storeId;
+        console.log(object)
         editMenuType(object).then((res) => {
           getMenuTypeList(this.query).then((res) => {
             this.menuTypeList = res.data;
@@ -876,11 +877,9 @@ a {
   -webkit-box-flex: 3;
   -webkit-flex: 3;
   flex: 3;
-  height: 100vh;
   width: 100vw;
   background-image: url("../../assets/images/菜单.jpg");
-  background-repeat: no-repeat;
-  background-size: cover;
+  background-repeat: repeat-y;
 }
 .upDiv .upinp[data-v-47984b77] {
   width: 100%;

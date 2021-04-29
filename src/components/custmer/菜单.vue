@@ -18,16 +18,9 @@
         <div @click="onSearch">搜索</div>
       </template>
     </van-search>
-
-    <van-swipe class="my-swipe" :autoplay="3000" indicator-color="white" v-if="swipeShow">
-      <van-swipe-item>
-        <van-image :src="require('../../assets/images/轮播2.jpg')" />
-      </van-swipe-item>
-      <van-swipe-item>
-        <van-image :src="require('../../assets/images/轮播3.jpg')" />
-      </van-swipe-item>
-      <van-swipe-item>
-        <van-image :src="require('../../assets/images/轮播4.jpg')" />
+    <van-swipe class="my-swipe" indicator-color="white" v-if="swipeShow" :autoplay="3000">
+      <van-swipe-item v-for="(image, index) in imgList2" :key="index">
+        <van-image width="7rem" height="3rem" :src="image" />
       </van-swipe-item>
     </van-swipe>
 
@@ -223,28 +216,6 @@
         </van-swipe>
       </div>
     </van-overlay>
-
-    <!-- 图标位置 -->
-    <van-popup
-      v-model="payShow"
-      closeable
-      close-icon-position="top-left"
-      position="bottom"
-      :style="{ height: '55%' }"
-    >
-      <h2>请输入支付密码</h2>
-      <!-- 密码输入框 -->
-      <van-password-input
-        :value="value"
-        :focused="showKeyboard"
-        info="密码为 6 位数字"
-        :error-info="errorInfo"
-        @focus="showKeyboard = true"
-        :length="6"
-      />
-      <!-- 数字键盘 -->
-      <van-number-keyboard v-model="value" :show="showKeyboard" @blur="show=false" />
-    </van-popup>
   </div>
 </template>
 
@@ -277,7 +248,7 @@ export default {
         menuName: "",
       },
       active: 0,
-      swipeShow : true,
+      swipeShow: true,
       list: [],
       loading: false,
       finished: true,
@@ -291,7 +262,7 @@ export default {
       recommendList: [],
       container: null,
       show: true,
-      payShow:false,
+      payShow: false,
       advertisementShow: true,
       imgList: [],
       fileList: [],
@@ -331,8 +302,8 @@ export default {
     this.request.storeId = this.query.storeId;
     this.request.type = 0;
     getAdvertisement(this.request).then((res) => {
-      if(res.data.length==0){
-        this.advertisementShow=false
+      if (res.data.length == 0) {
+        this.advertisementShow = false;
       }
       console.log(res.data);
       res.data.forEach((element) => {
@@ -344,9 +315,9 @@ export default {
       });
       this.request.type = 1;
       getAdvertisement(this.request).then((res) => {
-        if(res.data.length==0){
-        this.swipeShow=false
-      }
+        if (res.data.length == 0) {
+          this.swipeShow = false;
+        }
         console.log(res.data);
         res.data.forEach((element) => {
           this.imgList2.push(element.advertisementImg);
@@ -573,12 +544,9 @@ a {
   -webkit-box-flex: 3;
   -webkit-flex: 3;
   flex: 3;
-
   width: 100vh;
-  height: 100vh;
   background-image: url("../../assets/images/菜单.jpg");
-  background-repeat: no-repeat;
-  background-size: cover;
+  background-repeat: repeat-y;
 }
 .setNum {
   background-color: tomato;
