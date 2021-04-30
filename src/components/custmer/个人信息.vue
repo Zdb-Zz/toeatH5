@@ -5,8 +5,6 @@
       left-text="返回"
       @click-left="onClickLeft"
       class="formTop"
-      right-text="编辑"
-      @click-right="isReadonly=false,isSubmitShow=true"
     />
     <van-form @submit="onSubmit">
       <van-field :disabled="isReadonly" v-model="user.userName" label="用户名" />
@@ -22,7 +20,7 @@
         v-if="user.userStore!=null"
       />
       <div style="margin: 16px;">
-        <van-button round block type="primary" @click="show=true">修改支付密码</van-button>
+        <van-button round block type="primary" @click="show=true" native-type="button">修改支付密码</van-button>
       </div>
       <div style="margin: 16px;">
         <van-button v-if="isSubmitShow" round block type="info" native-type="submit">保存</van-button>
@@ -34,7 +32,7 @@
       closeable
       close-icon-position="top-left"
       position="bottom"
-      :style="{ height: '55%' }"
+      :style="{ height: '65%' }"
     >
       <h2>请输入支付密码</h2>
       <!-- 密码输入框 -->
@@ -56,7 +54,7 @@
       closeable
       close-icon-position="top-left"
       position="bottom"
-      :style="{ height: '55%' }"
+      :style="{ height: '65%' }"
     >
       <h2>请输入支付密码</h2>
       <!-- 密码输入框 -->
@@ -82,8 +80,8 @@ export default {
   data() {
     return {
       user: {},
-      isReadonly: true,
-      isSubmitShow: false,
+      isReadonly: false,
+      isSubmitShow: true,
       show: false,
       show2: false,
       value: "",
@@ -115,8 +113,8 @@ export default {
               this.user.userPayPassword = newVal.value;
               console.log("111")
               editUser(this.user).then((res) => {
-                this.isReadonly = true;
-                this.isSubmitShow = false;
+                this.isReadonly = false;
+                this.isSubmitShow = true;
                 this.show2=false
                 Toast.success("修改成功")
               });
@@ -139,8 +137,9 @@ export default {
     },
     onSubmit() {
       editUser(this.user).then((res) => {
-        this.isReadonly = true;
-        this.isSubmitShow = false;
+        this.isReadonly = false;
+        this.isSubmitShow = true;
+        Toast.success("保存成功")
       });
     },
   },

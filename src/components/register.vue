@@ -24,7 +24,7 @@
           placeholder="密码"
           :rules="[{ required: true, message: '请填写密码' }]"
         />
-        <van-field v-model="value" center clearable label="支付密码" placeholder="" type="password">
+        <van-field v-model="value" center clearable label="支付密码" placeholder type="password">
           <template #button>
             <van-button size="small" type="primary" @click="show = true">输入支付密码</van-button>
           </template>
@@ -58,6 +58,8 @@
           <van-button round block type="info" native-type="submit">注册</van-button>
         </div>
       </div>
+      <van-field v-model="location" name="定位" label="定位" placeholder="定位" />
+      <van-button round block type="info" @click="getPosition()">获取定位</van-button>
     </van-form>
     <!-- 图标位置 -->
     <van-popup
@@ -65,7 +67,7 @@
       closeable
       close-icon-position="top-left"
       position="bottom"
-      :style="{ height: '55%' }"
+      :style="{ height: '65%' }"
     >
       <h2>请输入支付密码</h2>
       <!-- 密码输入框 -->
@@ -85,7 +87,7 @@
 
 <script>
 import { register } from "../api/index";
-import { Toast } from "vant";
+import { Toast, Dialog } from "vant";
 import router from "../router";
 export default {
   data() {
@@ -102,12 +104,13 @@ export default {
       show: false,
       showKeyboard: true,
       errorInfo: "",
+      location:''
     };
   },
   watch: {
     value(value) {
       if (value.length === 6) {
-        this.show =false
+        this.show = false;
       } else {
         this.errorInfo = "";
       }
@@ -132,6 +135,42 @@ export default {
     },
     onClickRight() {
       console.log("onClickRight");
+    },
+
+    getPosition() {
+      let _tant = this;
+      AMap.plugin("AMap.Geolocation", function () {
+        //         _tant.$dialog.loading.open("获取定位中...");
+        var geolocation = new AMap.Geolocation({
+          // 是否使用高精度定位，默认：true
+          enableHighAccuracy: true, // 设置定位超时时间，默认：无穷大
+          timeout: 10000, //自动偏移
+          convert: false, // 定位按钮的停靠位置的偏移量，默认：Pixel(10, 20)
+          buttonOffset: new AMap.Pixel(10, 20), //  定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
+          zoomToAccuracy: false,
+          panToLocation: true, //  定位按钮的排放位置,  RB表示右下
+          buttonPosition: "RB",
+        });
+        geolocation.getCurrentPosition();
+        console.log(geolocation);
+        AMap.event.addListener(geolocation, "complete", onComplete);
+        AMap.event.addListener(geolocation, "error", onError);
+        function onComplete(data) {
+          console.log(data)
+          if (data.formattedAddress) {
+            console.log(data.formattedAddress);
+            _tant.location = data.formattedAddress
+            //             _tant.info.enterpriseInterviewLocation = data.formattedAddress
+          } else {
+            console.log("获取定位失败");
+          }
+          //           _tant.$dialog.loading.close();
+        } // 定位出错
+        function onError(data) {
+          mobile.toast("获取定位失败");
+          //           _tant.$dialog.loading.close();
+        }
+      });
     },
   },
 };

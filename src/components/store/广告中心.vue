@@ -12,7 +12,7 @@
             :max-count="2"
           />
 
-          <van-button round block type="info" native-type="submit" @click="show = true,showImg()">预览</van-button>
+          <van-button round block type="info" native-type="submit" @click="show = true,showImg()" :style="{ marginBottom: '1rem' }">预览</van-button>
           <van-button
             round
             block
@@ -28,7 +28,7 @@
             :before-delete="delImg2"
             :max-count="3"
           />
-          <van-button round block type="info" native-type="submit" @click="show2 = true,showImg()">预览</van-button>
+          <van-button round block type="info" native-type="submit" @click="show2 = true,showImg()" :style="{ marginBottom: '1rem' }">预览</van-button>
           <van-button
             round
             block

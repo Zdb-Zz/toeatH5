@@ -30,12 +30,25 @@
       </template>
       </van-field>-->
       <van-field
+        v-model="address"
+        name="定位地址"
+        label="定位地址"
+        placeholder="定位地址"
+        readonly
+        :rules="[{ required: true, message: '定位地址' }]"
+      >
+        <template #button>
+          <van-button size="small" type="primary" @click="show = true,clickAdress()">获取定位</van-button>
+        </template>
+      </van-field>
+      <van-field
         v-model="query.storeAddress"
-        name="商家地址"
-        label="商家地址"
-        placeholder="商家地址"
-        :rules="[{ required: true, message: '商家地址' }]"
-      />
+        name="商家详细地址"
+        label="商家详细地址"
+        placeholder="商家详细地址"
+        :rules="[{ required: true, message: '商家详细地址' }]"
+      >
+      </van-field>
       <div class="box">
         <div class="foodImg">
           <van-image :src="`${imgSrc}` " width="2rem" height="2rem">
@@ -61,6 +74,40 @@
         <van-button round block type="info" native-type="submit">提交</van-button>
       </div>
     </van-form>
+    <!-- 图标位置 -->
+    <van-popup
+      v-model="show"
+      closeable
+      close-icon-position="top-left"
+      position="bottom"
+      :style="{ height: '60%' }"
+    >
+      <div class="content">
+        <div class="amap-wrapper">
+          <el-amap-search-box
+            class="search-box"
+            :search-option="searchOption"
+            :on-search-result="onSearchResult"
+          ></el-amap-search-box>
+          <el-amap
+            class="amap-box"
+            :zoom="zoom"
+            :center="center"
+            :events="events"
+            :mapStyle="mapStyle"
+          >
+            <el-amap-marker v-for="(marker, i) in markers" :key="i" :position="marker"></el-amap-marker>
+          </el-amap>
+        </div>
+        <div
+          class="Y-font-size-20 Y-margin-vertical-top-8 positionText"
+        >
+        <p>您选择的地址是：{{address}}</p> 经纬度为：{{lng}} , {{lat}}</div>
+        <div class="Y-text-align-right Y-avg-1">
+          <van-button class="positionButton" type="primary" @click="getLnglat(),show=false">确 定</van-button>
+        </div>
+      </div>
+    </van-popup>
   </div>
 </template>
 
@@ -94,13 +141,56 @@ export default {
         storeId: null,
         storeImg: "",
         storeAddress: "",
+        storePosition:'',
+        storeLng:'',
+        storeLat:'',
       },
       imgSrc: "",
+      show: false,
+      center: [120.165411, 30.32618], //地图中心点坐标 济南市
+      zoom: 12, //初始化地图显示层级
+      mapStyle: "amap://styles/8b6be8ec497009e17a708205348b899a", //设置地图样式
+      markers: [[120.165411, 30.32618]],
+      searchOption: {
+        city: "中国",
+        citylimit: true,
+      },
+      address: "",
+      lng: 120.165411,
+      lat: 30.32618,
+      events: {
+        init: (o) => {},
+        moveend: () => {},
+        zoomchange: () => {},
+        click: (e) => {
+          var _this = this;
+          let { lng, lat } = e.lnglat;
+          this.center = [lng, lat];
+          this.markers = [[lng, lat]];
+          this.lng = lng;
+          this.lat = lat;
+          // 这里通过高德 SDK 完成。
+          var geocoder = new AMap.Geocoder({
+            radius: 1000,
+            extensions: "all",
+          });
+          geocoder.getAddress([lng, lat], function (status, result) {
+            if (status === "complete" && result.info === "OK") {
+              if (result && result.regeocode) {
+                _this.address = result.regeocode.formattedAddress;
+              }
+            }
+          });
+        },
+      },
     };
   },
   methods: {
     createStore() {
       this.query.storeImg = this.imgSrc;
+      this.query.storeLng = this.lng
+      this.query.storeLat = this.lat
+      this.query.storePosition = this.address
       createStore(this.query).then((res) => {
         Cookies.set("storeId", res.data);
         this.$router.push({
@@ -181,6 +271,33 @@ export default {
         alert(e);
       }
     },
+    addMarker: function () {
+      this.markers = [];
+      let lng = 120.165411 + Math.round(Math.random() * 1000) / 10000;
+      let lat = 30.32618 + Math.round(Math.random() * 500) / 10000;
+      this.markers = [[lng, lat]];
+    },
+    onSearchResult(pois) {
+      let latSum = 0;
+      let lngSum = 0;
+      if (pois.length > 0) {
+        let center = pois[0];
+        this.lng = center.lng;
+        this.lat = center.lat;
+        this.address = center.name;
+        this.center = [center.lng, center.lat];
+        this.markers = [[center.lng, center.lat]];
+      }
+    },
+    getLnglat() {
+      this.$emit("getLnglat", this.lng, this.lat, this.address);
+      this.query.storeAddress=this.address
+      this.query.lng = this.storeLng
+      this.query.lat = this.storeLat
+    },
+    clickAdress(){
+      this.address = "杭州市浙江树人大学"
+    }
   },
 };
 </script>
@@ -290,5 +407,21 @@ a {
   z-index: 99;
   background-repeat: no-repeat;
   background-size: cover;
+}
+.search-box {
+  position: absolute;
+  width: 100%;
+}
+.amap-wrapper {
+  width: 100%;
+  height: 10rem;
+  position: relative;
+}
+.positionText{
+  width: 80%;
+}
+.positionButton{
+  float: right;
+  top: -1.3rem;
 }
 </style>

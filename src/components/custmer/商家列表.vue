@@ -59,15 +59,18 @@
 </template>
 
 <script>
-import { Toast } from "vant";
+import { Toast, Dialog } from "vant";
 import { getStoreList, findUser } from "../../api/index";
 import router from "../../router";
+import Cookies from "js-cookie";
+
 export default {
   data() {
     return {
       query: {
         storeName: "",
       },
+      location: {},
       user: {},
       active: 0,
       loading: false,
@@ -82,7 +85,11 @@ export default {
     };
   },
   created() {
-    getStoreList().then((res) => {
+    this.location.lng = Cookies.get("lng");
+    this.location.lat = Cookies.get("lat");
+    this.query.lng = Cookies.get("lng");
+    this.query.lat = Cookies.get("lat");
+    getStoreList(this.location).then((res) => {
       if (res.code == 1) {
         this.show = false;
       } else {
@@ -140,6 +147,8 @@ export default {
       });
     },
     onSearch() {
+      this.query.lng = Cookies.get("lng");
+      this.query.lat = Cookies.get("lat");
       getStoreList(this.query).then((res) => {
         if (res.data == null) {
           Toast.fail("没有找到商铺");

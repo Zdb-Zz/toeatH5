@@ -5,13 +5,23 @@
       left-text="返回"
       @click-left="onClickLeft"
       class="formTop"
-      right-text="编辑"
-      @click-right="isReadonly=false,isSubmitShow=true"
     />
     <van-form @submit="onSubmit">
-      <van-field :disabled="isReadonly" v-model="store.storeName" label="商家名称" />
-      <van-field :disabled="isReadonly" v-model="store.storeRemark" label="商家简介" />
-      <van-field :disabled="isReadonly" v-model="store.storeAddress" label="商家地址" />
+      <van-field :readonly="isReadonly" v-model="store.storeName" label="商家名称" />
+      <van-field :readonly="isReadonly" v-model="store.storeRemark" label="商家简介" />
+      <van-field
+        v-model="address"
+        name="定位地址"
+        label="定位地址"
+        placeholder="定位地址"
+        :readonly="isReadonly"
+        :rules="[{ required: true, message: '定位地址' }]"
+      >
+        <template #button>
+          <van-button size="small" type="primary" @click="show = true" native-type="button">获取定位</van-button>
+        </template>
+      </van-field>
+      <van-field :readonly="isReadonly" v-model="store.storeAddress" label="商家详细地址" />
       <div class="box">
         <div class="foodImg">
           <van-image :src="`${imgSrc}` " width="2rem" height="2rem">
@@ -37,12 +47,47 @@
         <van-button v-if="isSubmitShow" round block type="info" native-type="submit">保存</van-button>
       </div>
     </van-form>
+    <!-- 图标位置 -->
+    <van-popup
+      v-model="show"
+      closeable
+      close-icon-position="top-left"
+      position="bottom"
+      :style="{ height: '70%' }"
+    >
+      <div class="content">
+        <div class="amap-wrapper">
+          <el-amap-search-box
+            class="search-box"
+            :search-option="searchOption"
+            :on-search-result="onSearchResult"
+          ></el-amap-search-box>
+          <el-amap
+            class="amap-box"
+            :zoom="zoom"
+            :center="center"
+            :events="events"
+            :mapStyle="mapStyle"
+          >
+            <el-amap-marker v-for="(marker, i) in markers" :key="i" :position="marker"></el-amap-marker>
+          </el-amap>
+        </div>
+        <div class="Y-font-size-20 Y-margin-vertical-top-8 positionText">
+          <p>您选择的地址是：{{address}}</p>
+          经纬度为：{{lng}} , {{lat}}
+        </div>
+        <div class="Y-text-align-right Y-avg-1">
+          <van-button class="positionButton" type="primary" @click="getLnglat(),show=false">确 定</van-button>
+        </div>
+      </div>
+    </van-popup>
   </div>
 </template>
 
 <script>
 import router from "../../router";
 import { getStoreByUser, editStore } from "../../api/index";
+import { Toast } from 'vant';
 export default {
   props: {
     value: {
@@ -61,15 +106,56 @@ export default {
   data() {
     return {
       store: {},
-      isReadonly: true,
-      isSubmitShow: false,
+      isReadonly: false,
+      isSubmitShow: true,
       imgSrc: "",
+      show: false,
+      center: [120.165411, 30.32618], //地图中心点坐标
+      zoom: 12, //初始化地图显示层级
+      mapStyle: "amap://styles/8b6be8ec497009e17a708205348b899a", //设置地图样式
+      markers: [[120.165411, 30.32618]],
+      searchOption: {
+        city: "全国",
+        citylimit: true,
+      },
+      address: "",
+      lng: 120.165411,
+      lat: 30.32618,
+      events: {
+        init: (o) => {},
+        moveend: () => {},
+        zoomchange: () => {},
+        click: (e) => {
+          var _this = this;
+          let { lng, lat } = e.lnglat;
+          this.center = [lng, lat];
+          this.markers = [[lng, lat]];
+          this.lng = lng;
+          this.lat = lat;
+          // 这里通过高德 SDK 完成。
+          var geocoder = new AMap.Geocoder({
+            radius: 1000,
+            extensions: "all",
+          });
+          geocoder.getAddress([lng, lat], function (status, result) {
+            if (status === "complete" && result.info === "OK") {
+              if (result && result.regeocode) {
+                _this.address = result.regeocode.formattedAddress;
+
+              }
+            }
+          });
+        },
+      },
     };
   },
   created() {
     getStoreByUser().then((res) => {
       this.store = res.data;
       this.imgSrc = res.data.storeImg;
+      this.address = res.data.storePosition
+      this.lng = res.data.storeLng
+      this.lat = res.data.storeLat
     });
   },
   methods: {
@@ -78,9 +164,13 @@ export default {
     },
     onSubmit() {
       this.store.storeImg = this.imgSrc;
+      this.store.storeLng = this.lng;
+      this.store.storeLat = this.lat
+      this.store.storePosition = this.address
       editStore(this.store).then((res) => {
-        this.isReadonly = true;
-        this.isSubmitShow = false;
+        this.isReadonly = false;
+        this.isSubmitShow = true;
+        Toast.success("保存成功")
       });
     },
     /**上传图片 */
@@ -143,6 +233,30 @@ export default {
         console.log(e);
         alert(e);
       }
+    },
+    addMarker: function () {
+      this.markers = [];
+      let lng = 120.165411 + Math.round(Math.random() * 1000) / 10000;
+      let lat = 30.32618 + Math.round(Math.random() * 500) / 10000;
+      this.markers = [[lng, lat]];
+
+    },
+    onSearchResult(pois) {
+      let latSum = 0;
+      let lngSum = 0;
+      if (pois.length > 0) {
+        let center = pois[0];
+        this.lng = center.lng;
+        this.lat = center.lat;
+        this.address = center.name;
+        this.center = [center.lng, center.lat];
+        this.markers = [[center.lng, center.lat]];
+      }
+    },
+    getLnglat() {
+      this.$emit("getLnglat", this.lng, this.lat, this.address);
+      this.store.storeLng = this.storeLng;
+      this.store.storeLat = this.storeLat;
     },
   },
 };
@@ -258,5 +372,22 @@ a {
 }
 .van-cell {
   background-color: rgba(0, 0, 0, 0);
+}
+.search-box {
+  position: absolute;
+  width: 100%;
+}
+.amap-wrapper {
+  width: 100%;
+  height: 10rem;
+  position: relative;
+}
+.positionText {
+  width: 80%;
+  height: 3rem;
+}
+.positionButton {
+  float: right;
+  top: -3rem;
 }
 </style>
