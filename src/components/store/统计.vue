@@ -28,7 +28,6 @@
           </van-tabs>
           <div id="totalBusiness" :style="{width: '100%', height: '300%'}"></div>
         </van-collapse-item>
-        <van-collapse-item title="标题3" name="3">内容</van-collapse-item>
       </van-collapse>
       <van-tabbar v-model="active">
         <van-tabbar-item icon="home-o" @click="menu">菜单</van-tabbar-item>
